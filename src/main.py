@@ -126,7 +126,8 @@ def add_birthday(address_book: AddressBook, args):
         contact_name, date_of_birth = args
         day, month, year = date_of_birth.split(".")
     except ValueError:
-        raise ValueError("Please provide name and date of birth in format DD.MM.YYY")
+        raise ValueError(
+            "Please provide name and date of birth in format DD.MM.YYY")
     contact = address_book.find(contact_name)
     contact.add_birthday(int(year), int(month), int(day))
     return f"{contact.name}'s birthday was added to the Address book"
@@ -156,11 +157,13 @@ def get_all(address_book: AddressBook, _):
         print(f"|{'No records found. Add at first':^133}|")
         print(f"|{'_'*133}|")
 
-def render_contacts(records:[Record], _):
+
+def render_contacts(records: [Record], _):
     address_book: AddressBook = AddressBook()
     for record in records:
-        address_book.add_record(record) 
+        address_book.add_record(record)
     get_all(address_book, _)
+
 
 def birthdays(address_book: AddressBook, _):
     number_of_days = int(input("Please enter the number of days you want to check: "))
@@ -202,13 +205,16 @@ def save_to_file(book: AddressBook, filename: str = "address_book.pkl"):
         pickle.dump(book, file)
     return f"Address book was saved to {filename}"
 
+
+@input_error
 def find(book: AddressBook, args):
     try:
         search_parameter = args[0]
     except IndexError:
         raise IndexError("Please provide value to search")
-    records:[Record] = book.find_all(search_parameter)
+    records: [Record] = book.find_all(search_parameter)
     render_contacts(records, args)
+
 
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
     try:
@@ -258,7 +264,7 @@ def main():
         "birthdays": birthdays,
         "remove": remove,
         "all": get_all,
-        "find" : find,
+        "find": find,
     }
 
     print("Welcome to the assistant bot!")
