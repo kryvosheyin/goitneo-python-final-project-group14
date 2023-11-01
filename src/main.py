@@ -140,6 +140,13 @@ def show_birthday(address_book: AddressBook, args):
         return f"{contact.name} does not have birthday saved in the Address book"
     return contact.birthday
 
+@input_error
+def add_address(address_book: AddressBook, args):
+    name, address = extract_args(args)
+    contact = address_book.find(name)
+    contact.address = address
+    return f"Address added to {contact.name}"
+
 
 def get_all(address_book: AddressBook, _):
     print(f"{'_'*135}")
@@ -223,6 +230,7 @@ Add/change Birthday - 'add-birthday' <name without spaces> <date in format DD.MM
 Get Birthday of contact - 'show-birthday' <name without spaces>
 Get list of contacts to be congratulated next week - 'birthdays'
 Remove contact - 'remove' <name without spaces> 
+Add address - 'add-address' <name without spaces> <address>
 Print all contacts - 'all'            
         """
 
@@ -244,6 +252,7 @@ def main():
         "show-birthday": show_birthday,
         "birthdays": birthdays,
         "remove": remove,
+        "add-address": add_address,
         "all": get_all,
     }
 
