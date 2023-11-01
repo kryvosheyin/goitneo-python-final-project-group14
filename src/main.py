@@ -156,6 +156,11 @@ def get_all(address_book: AddressBook, _):
         print(f"|{'No records found. Add at first':^133}|")
         print(f"|{'_'*133}|")
 
+def render_contacts(records:[Record], _):
+    address_book: AddressBook = AddressBook()
+    for record in records:
+        address_book.add_record(record) 
+    get_all(address_book, _)
 
 def birthdays(address_book: AddressBook, _):
     number_of_days = int(input("Please enter the number of days you want to check: "))
@@ -197,6 +202,13 @@ def save_to_file(book: AddressBook, filename: str = "address_book.pkl"):
         pickle.dump(book, file)
     return f"Address book was saved to {filename}"
 
+def find(book: AddressBook, args):
+    try:
+        search_parameter = args[0]
+    except IndexError:
+        raise IndexError("Please provide value to search")
+    records:[Record] = book.find_all(search_parameter)
+    render_contacts(records, args)
 
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
     try:
@@ -216,6 +228,7 @@ Add new phone - 'add-phone' <name without spaces> <phone1>,<phone2>,...
 Remove phone - 'remove-phone' <name without spaces> <phone>
 Edit phone - 'edit-phone' <name without spaces> <phone-to-change> <phone-new>
 Get all phones for contact - 'get-phone' <name without spaces>
+Find contacts by value - 'find' <value containing in any field>
 Add email - 'add-email' <name without spaces> <email>
 Change email - 'change-email' <name without spaces> <email>
 Remove email - 'remove-email' <name without spaces>
@@ -245,6 +258,7 @@ def main():
         "birthdays": birthdays,
         "remove": remove,
         "all": get_all,
+        "find" : find,
     }
 
     print("Welcome to the assistant bot!")
