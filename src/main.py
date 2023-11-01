@@ -12,6 +12,7 @@ from classes.Record import Record
 from classes.Email import Email
 from classes.Birthday import Birthday
 from classes.birthdays import get_upcoming_birthdays
+from classes.Note import Note #ОЛЯ
 import pickle
 
 
@@ -264,6 +265,42 @@ def main():
         else:
             print("Invalid command.")
 
+
+# ОЛЯ НОТАТКИ
+
+def note():
+    address_book = AddressBook()
+    
+    while True:
+        choice = input("1. Додати нотатку\n2. Пошук нотаток\n3. Видалити нотатку\n4. Редагувати нотатку\n5. Вийти\nВаш вибір: ")
+        
+        if choice == "1":
+            title = input("Введіть заголовок: ")
+            text = input("Введіть текст: ")
+            tags = input("Введіть теги (розділені комами): ").split(',')
+            note = Note(title, text, tags)
+            address_book.add_note(note)
+
+        elif choice == "2":
+            query = input("Введіть текст для пошуку: ")
+            results = address_book.find_notes(query)
+            if results != "nothing found":
+                for note in results:
+                    print(f"Заголовок: {note.title}\nТекст: {note.text}\nТеги: {', '.join(note.tags)}\n")
+            else:
+                print(results)
+
+        elif choice == "3":
+            title = input("Введіть заголовок нотатки, яку хочете видалити: ")
+            address_book.remove_note(title)
+
+        elif choice == "4":
+            title = input("Введіть заголовок нотатки для редагування: ")
+            new_text = input("Введіть новий текст: ")
+            address_book.edit_note(title, new_text)
+
+        elif choice == "5":
+            break
 
 if __name__ == "__main__":
     main()
