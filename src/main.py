@@ -116,7 +116,7 @@ def remove_email(address_book: AddressBook, args):
 def remove(address_book: AddressBook, args):
     contact_name = extract_name(args)
     contact = address_book.find(contact_name)
-    address_book.delete(contact)
+    address_book.delete(contact.name)
     return "Removed."
 
 

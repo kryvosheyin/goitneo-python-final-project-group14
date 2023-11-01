@@ -11,17 +11,6 @@ class Record:
         self.email: Email = None
         self.birthday: Birthday = None
 
-    # def __str__(self):
-    #     return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
-
-    # def add_phone(self, phone: Phone):
-    #     self.phones.append(phone)
-
-    # def remove_phone(self, phone: Phone):
-    #     found = list(filter(lambda p: str(p) == str(phone), self.phones))
-    #     for i in found:
-    #         self.phones.remove(i)
-
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
 

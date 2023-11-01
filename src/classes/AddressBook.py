@@ -14,5 +14,8 @@ class AddressBook(UserDict):
             raise KeyError(f"Contact {name} is not found")
         return contact
 
-    def delete(self, record_name: Record):
-        self.data.pop(record_name, None)
+    def delete(self, record_name: Name):
+        try:
+            del self.data[record_name.value]
+        except KeyError:
+            raise KeyError("Unable to find {record_name} in the address book")
