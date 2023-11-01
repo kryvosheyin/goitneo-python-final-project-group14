@@ -7,7 +7,6 @@ from classes.Exceptions import (
 )
 from classes.AddressBook import AddressBook
 from classes.Name import Name
-from classes.Phone import Phone
 from classes.Record import Record
 from classes.Email import Email
 from classes.Birthday import Birthday
@@ -81,27 +80,37 @@ def get_phone(address_book: AddressBook, args):
 
 
 @input_error
-def edit_phone(address_book: AddressBook, args):
-    name, phone = extract_args(args)
-    contact = address_book.find(name)
-    contact.edit_phone(phone)
-    return f"Contact {contact.name} was updated with {phone}"
+def edit_phone(contact: Record, args):
+    new_phone, args = extract_arguments("missing new phone value")(args)
+    return contact.edit_phone(new_phone)
 
 
 @input_error
-def add_email(address_book: AddressBook, args):
-    name, email = extract_args(args)
-    contact = address_book.find(name)
+def edit_email(contact: Record, args):
+    email, _args = extract_arguments("missing new email value")(args)
+    old_email_exists = contact.email
     contact.email = Email(email)
-    return f"Email added to {contact.name}"
+    return f"Email changed for {contact.name}" if old_email_exists else f"Email added to {contact.name}"
 
 
 @input_error
-def change_email(address_book: AddressBook, args):
-    name, email = extract_args(args)
-    contact = address_book.find(name)
-    contact.email = Email(email)
-    return "Email changed"
+def edit_birthday(contact: Record, args):
+    date_of_birth, args = extract_arguments("missing new birthday value")(args)
+    try:
+        day, month, year = date_of_birth.split(".")
+    except ValueError:
+        raise ValueError(
+            "Please provide name and date of birth in format DD.MM.YYY")
+    contact.birthday = Birthday(int(year), int(month), int(day))
+    return f"Birthday chenged to {contact.birthday} for {contact.name}"
+
+
+def edit_name(address_book: AddressBook, contact: Record, args):
+    name, args = extract_arguments("missing new name")(args)
+    address_book.delete(contact.name)
+    contact.name = Name(name)
+    address_book.add_record(contact)
+    return f"Name changed to {contact.name}"
 
 
 @input_error
@@ -121,16 +130,34 @@ def remove(address_book: AddressBook, args):
 
 
 @input_error
-def add_birthday(address_book: AddressBook, args):
-    try:
-        contact_name, date_of_birth = args
-        day, month, year = date_of_birth.split(".")
-    except ValueError:
-        raise ValueError(
-            "Please provide name and date of birth in format DD.MM.YYY")
-    contact = address_book.find(contact_name)
-    contact.add_birthday(int(year), int(month), int(day))
-    return f"{contact.name}'s birthday was added to the Address book"
+def edit(address_book: AddressBook, args):
+    EDIT_COMMANDS = {
+        'phone': edit_phone,
+        'email': edit_email,
+        'birthday': edit_birthday,
+        'name': edit_name,
+    }
+    extract_contact_name = extract_arguments("Please provide contact name")
+    name, args = extract_contact_name(args)
+    contact = address_book.find(name)
+    extract_command = extract_arguments(
+        f"Command is missing. Please use: edit [name] [command] [args]. Available commands: {', '.join(EDIT_COMMANDS.keys())}")
+    command, args = extract_command(args)
+    if command == 'name':
+        status = EDIT_COMMANDS[command.lower()](address_book, contact, args)
+    else:
+        status = EDIT_COMMANDS[command.lower()](contact, args)
+    print(status)
+
+
+def extract_arguments(error_msg: str):
+    def decorator(args):
+        try:
+            value, *args = args
+            return value, args
+        except ValueError as e:
+            raise ValueError(error_msg)
+    return decorator
 
 
 @input_error
@@ -232,13 +259,13 @@ Start work - 'hello'
 Add new contact - 'add' <name without spaces> <phone>
 Add new phone - 'add-phone' <name without spaces> <phone1>,<phone2>,...
 Remove phone - 'remove-phone' <name without spaces> <phone>
-Edit phone - 'edit-phone' <name without spaces> <phone-to-change> <phone-new>
+Edit phone - 'edit' <name without spaces> phone <phone to replace> <new phone>
+Edit/add email - 'edit' <name without spaces> email <new email>
+Edit/add birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
+Edit name - 'edit' <name without spaces> name <new name>
 Get all phones for contact - 'get-phone' <name without spaces>
 Find contacts by value - 'find' <value containing in any field>
-Add email - 'add-email' <name without spaces> <email>
-Change email - 'change-email' <name without spaces> <email>
 Remove email - 'remove-email' <name without spaces>
-Add/change Birthday - 'add-birthday' <name without spaces> <date in format DD.MM.YYYY>
 Get Birthday of contact - 'show-birthday' <name without spaces>
 Get list of contacts to be congratulated next week - 'birthdays'
 Remove contact - 'remove' <name without spaces> 
@@ -252,14 +279,11 @@ def main():
         "help": print_help_message,
         "hello": print_hello,
         "add": add_contact,
+        "edit": edit,
         "add-phone": add_phone,
         "remove-phone": remove_phone,
-        "edit-phone": edit_phone,
         "get-phone": get_phone,
-        "add-email": add_email,
-        "change-email": change_email,
         "remove-email": remove_email,
-        "add-birthday": add_birthday,
         "show-birthday": show_birthday,
         "birthdays": birthdays,
         "remove": remove,

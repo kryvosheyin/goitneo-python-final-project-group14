@@ -3,7 +3,6 @@ from classes.Phone import Phone
 from classes.Email import Email
 from classes.Birthday import Birthday
 
-
 class Record:
     def __init__(self, name: Name):
         self.name = Name(name)
@@ -14,9 +13,6 @@ class Record:
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
 
-    def add_email(self, email: Email):
-        self.email = email
-
     def add_birthday(self, year, month, day):
         self.birthday = Birthday(year, month, day)
 
@@ -26,12 +22,18 @@ class Record:
                 f"There is more than one phone saved for {self.name}:\n{self.get_phones()}\nPlease pick position of the number to change: "
             )
             try:
+                old_phone = self.phones[int(response) - 1]
                 self.phones[int(response) - 1] = Phone(new_phone)
+                return f"Phone from {old_phone} changed to {new_phone} for {self.name}"
             except IndexError:
                 raise IndexError("The number provided is not valid, please try again")
+        elif len(self.phones) == 1:
+            old_phone = self.phones[0]
+            self.phones[0] = Phone(new_phone)
+            return f"Phone from {old_phone} changed to {new_phone} for {self.name}"
         else:
-            self.phones.clear()
             self.phones.append(Phone(new_phone))
+            return f"Phone {new_phone} added for {self.name}"
 
     def remove_phone(self):
         self.phones.clear()
