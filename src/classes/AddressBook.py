@@ -31,8 +31,6 @@ class AddressBook(UserDict):
 
     def __test_value(self, value_in_lower: str) -> bool:
         def test(record_value) -> bool:
-            print(
-                f"test {value_in_lower} is {record_value} = {str(record_value).lower().find(value_in_lower)}")
             return record_value and str(record_value).lower().find(value_in_lower) > -1
         return test
 
