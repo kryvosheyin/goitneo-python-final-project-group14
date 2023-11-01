@@ -243,8 +243,8 @@ Add new contact - 'add' <name without spaces> <phone>
 Add new phone - 'add-phone' <name without spaces> <phone1>,<phone2>,...
 Remove phone - 'remove-phone' <name without spaces> <phone>
 Edit phone - 'edit' <name without spaces> phone <phone to replace> <new phone>
-Edit email - 'edit' <name without spaces> email <new email>
-Edit birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
+Edit/add email - 'edit' <name without spaces> email <new email>
+Edit/add birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
 Edit name - 'edit' <name without spaces> name <new name>
 Get all phones for contact - 'get-phone' <name without spaces>
 Remove email - 'remove-email' <name without spaces>
