@@ -185,6 +185,13 @@ def get_all(address_book: AddressBook, _):
         print(f"|{'_'*133}|")
 
 
+def render_contacts(records: [Record], _):
+    address_book: AddressBook = AddressBook()
+    for record in records:
+        address_book.add_record(record)
+    get_all(address_book, _)
+
+
 def birthdays(address_book: AddressBook, _):
     number_of_days = int(input("Please enter the number of days you want to check: "))
     birthday_dict = get_upcoming_birthdays(address_book.data.values(), number_of_days)
@@ -226,6 +233,16 @@ def save_to_file(book: AddressBook, filename: str = "address_book.pkl"):
     return f"Address book was saved to {filename}"
 
 
+@input_error
+def find(book: AddressBook, args):
+    try:
+        search_parameter = args[0]
+    except IndexError:
+        raise IndexError("Please provide value to search")
+    records: [Record] = book.find_all(search_parameter)
+    render_contacts(records, args)
+
+
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
     try:
         with open(filename, "rb") as file:
@@ -247,6 +264,7 @@ Edit/add email - 'edit' <name without spaces> email <new email>
 Edit/add birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
 Edit name - 'edit' <name without spaces> name <new name>
 Get all phones for contact - 'get-phone' <name without spaces>
+Find contacts by value - 'find' <value containing in any field>
 Remove email - 'remove-email' <name without spaces>
 Get Birthday of contact - 'show-birthday' <name without spaces>
 Get list of contacts to be congratulated next week - 'birthdays'
@@ -270,6 +288,7 @@ def main():
         "birthdays": birthdays,
         "remove": remove,
         "all": get_all,
+        "find": find,
     }
 
     print("Welcome to the assistant bot!")
