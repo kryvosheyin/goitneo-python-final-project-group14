@@ -3,33 +3,32 @@ from classes.Exceptions import (
     IncorrectPhoneFormatException,
     UnableToEditPhoneException,
     BirthdayFormatException,
+    IndexOutOfRangeException,
 )
 from classes.AddressBook import AddressBook
 from classes.Name import Name
-from classes.Phone import Phone
 from classes.Record import Record
 from classes.Email import Email
 from classes.Birthday import Birthday
+from classes.birthdays import get_upcoming_birthdays
+import pickle
 
 
 def input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except ValueError:
-            return "Give me name and phone please."
-        except KeyError:
-            return "Unable to find record"
-        except TypeError as e:
-            return f"Internal error. Contact developer {e}"
-        except IncorrectPhoneFormatException as err:
-            return err
-        except IncorrectNameException as err:
-            return err
-        except UnableToEditPhoneException as err:
-            return err
-        except BirthdayFormatException as err:
-            return err
+        except (
+            ValueError,
+            KeyError,
+            IndexError,
+            IncorrectPhoneFormatException,
+            IncorrectNameException,
+            UnableToEditPhoneException,
+            BirthdayFormatException,
+            IndexOutOfRangeException,
+        ) as err:
+            return str(err)
 
     return inner
 
@@ -40,127 +39,144 @@ def parse_input(user_input):
     return cmd, *args
 
 
+def print_hello(_, __):
+    return "How can I help you?"
+
+
+def print_help_message(_, __):
+    print(help)
+
+
 @input_error
 def add_contact(address_book: AddressBook, args):
-    name, phone = args
-    name_obj = Name(name)
-    record_obj = Record(name_obj)
-
-    phone_obj = Phone(phone)
-    record_obj.add_phone(phone_obj)
-
-    address_book.add_record(record_obj)
-    return "Contact added."
-
-
-def find_contact(name: str, address_book: AddressBook) -> Record:
-    found = address_book.find(Name(name))
-    if not found:
-        raise KeyError
-    return found
+    name, phone = extract_args(args)
+    contact = Record(name)
+    contact.add_phone(phone)
+    address_book.add_record(contact)
+    return f"Contact {name} was added"
 
 
 @input_error
 def add_phone(address_book: AddressBook, args):
-    name, phone = args
-    phones = phone.split(",")
-    name_obj = Name(name)
-    record: Record = find_contact(name_obj, address_book)
-    for ph in phones:
-        record.add_phone(Phone(ph))
-    return "Phone/s added."
+    name, phone = extract_args(args)
+    contact = address_book.find(name)
+    contact.add_phone(phone)
+    return f"Phone {phone} added to contact {contact.name}"
 
 
 @input_error
 def remove_phone(address_book: AddressBook, args):
-    name, phone = args
-    record: Record = find_contact(name, address_book)
-    record.remove_phone(Phone(phone))
-    return "Phone removed."
+    contact_name = extract_name(args)
+    contact = address_book.find(contact_name)
+    contact.remove_phone()
+    return f"All phone numbers for {contact.name} were removed"
 
 
 @input_error
 def get_phone(address_book: AddressBook, args):
-    name = args[0]
-    record: Record = find_contact(name, address_book)
-    phones = list(map(lambda r: str(r), record.phones))
-    return ", ".join(phones)
+    contact_name = extract_name(args)
+    contact = address_book.find(contact_name)
+    return contact.get_phones()
 
 
 @input_error
-def edit_phone(address_book: AddressBook, args):
-    name, old_phone, new_phone = args
-    record: Record = find_contact(name, address_book)
-    phones = list(filter(lambda r: str(r) == str(old_phone), record.phones))
-    if phones:
-        to_edit: Phone = phones[0]
-        to_edit.update_value(new_phone)
-        return "Phone changed."
-    else:
-        raise UnableToEditPhoneException(old_phone)
+def edit_phone(contact: Record, args):
+    new_phone, args = extract_arguments("missing new phone value")(args)
+    return contact.edit_phone(new_phone)
 
 
 @input_error
-def add_email(address_book: AddressBook, args):
-    name, email = args
-    record: Record = find_contact(name, address_book)
-    record.email = Email(email)
-    return "Email added."
+def edit_email(contact: Record, args):
+    email, _args = extract_arguments("missing new email value")(args)
+    old_email_exists = contact.email
+    contact.email = Email(email)
+    return f"Email changed for {contact.name}" if old_email_exists else f"Email added to {contact.name}"
 
 
 @input_error
-def change_email(address_book: AddressBook, args):
-    name, email = args
-    record: Record = find_contact(name, address_book)
-    record.email = Email(email)
-    return "Email changed."
+def edit_birthday(contact: Record, args):
+    date_of_birth, args = extract_arguments("missing new birthday value")(args)
+    try:
+        day, month, year = date_of_birth.split(".")
+    except ValueError:
+        raise ValueError(
+            "Please provide name and date of birth in format DD.MM.YYY")
+    contact.birthday = Birthday(int(year), int(month), int(day))
+    return f"Birthday chenged to {contact.birthday} for {contact.name}"
+
+
+def edit_name(address_book: AddressBook, contact: Record, args):
+    name, args = extract_arguments("missing new name")(args)
+    address_book.delete(contact.name)
+    contact.name = Name(name)
+    address_book.add_record(contact)
+    return f"Name changed to {contact.name}"
 
 
 @input_error
 def remove_email(address_book: AddressBook, args):
-    name = args[0]
-    record: Record = find_contact(name, address_book)
-    record.add_email(None)
-    return "Email removed."
+    contact_name = extract_name(args)
+    contact = address_book.find(contact_name)
+    contact.remove_email()
+    return "Email removed"
 
 
 @input_error
 def remove(address_book: AddressBook, args):
-    name = Name(args[0])
-    address_book.delete(name)
+    contact_name = extract_name(args)
+    contact = address_book.find(contact_name)
+    address_book.delete(contact.name)
     return "Removed."
 
 
 @input_error
-def add_birthday(address_book: AddressBook, args):
-    name, birthday = args
-    record: Record = find_contact(name, address_book)
-    try:
-        record.add_birthday(Birthday(birthday))
-        return "Birthday added."
-    except ValueError:
-        raise BirthdayFormatException(birthday)
+def edit(address_book: AddressBook, args):
+    EDIT_COMMANDS = {
+        'phone': edit_phone,
+        'email': edit_email,
+        'birthday': edit_birthday,
+        'name': edit_name,
+    }
+    extract_contact_name = extract_arguments("Please provide contact name")
+    name, args = extract_contact_name(args)
+    contact = address_book.find(name)
+    extract_command = extract_arguments(
+        f"Command is missing. Please use: edit [name] [command] [args]. Available commands: {', '.join(EDIT_COMMANDS.keys())}")
+    command, args = extract_command(args)
+    if command == 'name':
+        status = EDIT_COMMANDS[command.lower()](address_book, contact, args)
+    else:
+        status = EDIT_COMMANDS[command.lower()](contact, args)
+    print(status)
+
+
+def extract_arguments(error_msg: str):
+    def decorator(args):
+        try:
+            value, *args = args
+            return value, args
+        except ValueError as e:
+            raise ValueError(error_msg)
+    return decorator
 
 
 @input_error
 def show_birthday(address_book: AddressBook, args):
-    name = args[0]
-    record: Record = find_contact(name, address_book)
-    return (
-        record.birthday
-        if record.birthday
-        else "Birthday is not provided yet. Please add birthday"
-    )
+    contact_name = extract_name(args)
+    contact = address_book.find(contact_name)
+    if contact.birthday is None:
+        return f"{contact.name} does not have birthday saved in the Address book"
+    return contact.birthday
 
 
-def get_all(address_book: AddressBook):
+def get_all(address_book: AddressBook, _):
     print(f"{'_'*135}")
     print(f"|{'Name:':^40}|{'Phone:':^30}|{'Email:':^30}|{'Birthday:':^30}|")
     print(f"|{'_'*40}|{'_'*30}|{'_'*30}|{'_'*30}|")
     if len(address_book.data) > 0:
-        for record in address_book.data:
+        for contact, contact_info in address_book.data.items():
             print(
-                f"|{str(record.name):^40}|{', '.join(list(map(lambda rec: str(rec), record.phones))):^30}|{str(record.email) if record.email else '':^30}|{str(record.birthday) if record.birthday else '':^30}|"
+                f"|{str(contact_info.name):^40}|{(str(contact_info.get_phones_list())):^30}|{str(contact_info.email):^30}|{str(contact_info.birthday):^30}|"
             )
             print(f"|{'_'*40}|{'_'*30}|{'_'*30}|{'_'*30}|")
     else:
@@ -169,21 +185,54 @@ def get_all(address_book: AddressBook):
         print(f"|{'_'*133}|")
 
 
-def birthdays(address_book: AddressBook):
-    birthday_dict = address_book.get_birthdays_per_week()
+def birthdays(address_book: AddressBook, _):
+    number_of_days = int(input("Please enter the number of days you want to check: "))
+    birthday_dict = get_upcoming_birthdays(address_book.data.values(), number_of_days)
     print(f"{'_'*73}")
     print(f"|{'Day:':^30}|{'Name:':^40}|")
     print(f"|{'_'*30}|{'_'*40}|")
     if birthday_dict:
-        for day, list_of_records in birthday_dict.items():
-            print(
-                f"|{day:^30}|{', '.join(list(map(lambda rec: str(rec.name), list_of_records))):^40}|"
-            )
-            print(f"|{'_'*30}|{'_'*40}|")
+        sorted_days = sorted(birthday_dict)
+        for day in sorted_days:
+            if day in birthday_dict:
+                print(
+                    f"|{day.strftime('%d %B'):30}|{', '.join(birthday_dict[day]):^40}|"
+                )
+                print(f"|{'_'*30}|{'_'*40}|")
     else:
         print(f"|{' '*71}|")
         print(f"|{'No matches found.':^71}|")
         print(f"|{'_'*71}|")
+
+
+def extract_name(args: list):
+    try:
+        return args[0]
+    except IndexError:
+        raise IndexError("Please provide contact name")
+
+
+def extract_args(args: list):
+    try:
+        name, phone = args
+    except ValueError:
+        raise ValueError("Please provide name and phone")
+    return name, phone
+
+
+def save_to_file(book: AddressBook, filename: str = "address_book.pkl"):
+    with open(filename, "wb") as file:
+        pickle.dump(book, file)
+    return f"Address book was saved to {filename}"
+
+
+def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
+    try:
+        with open(filename, "rb") as file:
+            return pickle.load(file)
+    except FileNotFoundError:
+        print("Saved contacts not found. Creating new Address Book")
+        return AddressBook()
 
 
 help = """
@@ -193,12 +242,12 @@ Start work - 'hello'
 Add new contact - 'add' <name without spaces> <phone>
 Add new phone - 'add-phone' <name without spaces> <phone1>,<phone2>,...
 Remove phone - 'remove-phone' <name without spaces> <phone>
-Edit phone - 'edit-phone' <name without spaces> <phone-to-change> <phone-new>
+Edit phone - 'edit' <name without spaces> phone <phone to replace> <new phone>
+Edit email - 'edit' <name without spaces> email <new email>
+Edit birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
+Edit name - 'edit' <name without spaces> name <new name>
 Get all phones for contact - 'get-phone' <name without spaces>
-Add email - 'add-email' <name without spaces> <email>
-Change email - 'change-email' <name without spaces> <email>
 Remove email - 'remove-email' <name without spaces>
-Add/change Birthday - 'add-birthday' <name without spaces> <date in format DD.MM.YYYY>
 Get Birthday of contact - 'show-birthday' <name without spaces>
 Get list of contacts to be congratulated next week - 'birthdays'
 Remove contact - 'remove' <name without spaces> 
@@ -207,45 +256,36 @@ Print all contacts - 'all'
 
 
 def main():
-    address_book = AddressBook()
+    address_book = load_from_file()
+    COMMANDS = {
+        "help": print_help_message,
+        "hello": print_hello,
+        "add": add_contact,
+        "edit": edit,
+        "add-phone": add_phone,
+        "remove-phone": remove_phone,
+        "get-phone": get_phone,
+        "remove-email": remove_email,
+        "show-birthday": show_birthday,
+        "birthdays": birthdays,
+        "remove": remove,
+        "all": get_all,
+    }
+
     print("Welcome to the assistant bot!")
     print(help)
     while True:
         user_input = input("Enter a command: ")
         command, *args = parse_input(user_input)
         if command in ["close", "exit"]:
+            print("Saving contacts..")
+            save_to_file(address_book)
             print("Good bye!")
             break
-        elif command == "hello":
-            print("How can I help you?")
-        elif command == "add":
-            print(add_contact(address_book, args))
-        elif command == "add-phone":
-            print(add_phone(address_book, args))
-        elif command == "remove-phone":
-            print(remove_phone(address_book, args))
-        elif command == "edit-phone":
-            print(edit_phone(address_book, args))
-        elif command == "get-phone":
-            print(get_phone(address_book, args))
-        elif command == "add-email":
-            print(add_email(address_book, args))
-        elif command == "change-email":
-            print(change_email(address_book, args))
-        elif command == "remove-email":
-            print(remove_email(address_book, args))
-        elif command == "add-birthday":
-            print(add_birthday(address_book, args))
-        elif command == "show-birthday":
-            print(show_birthday(address_book, args))
-        elif command == "birthdays":
-            birthdays(address_book)
-        elif command == "remove":
-            print(remove(address_book, args))
-        elif command == "all":
-            get_all(address_book)
-        elif command == "help":
-            print(help)
+        elif command in COMMANDS:
+            result = COMMANDS[command](address_book, args)
+            if result:
+                print(result)
         else:
             print("Invalid command.")
 

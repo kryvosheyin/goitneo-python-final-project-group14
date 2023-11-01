@@ -28,3 +28,11 @@ class UnableToEditPhoneException(Exception):
 
     def __str__(self):
         return f"Phone does not exist: {self.message}"
+
+
+class IndexOutOfRangeException(Exception):
+    def __init(self, message: str):
+        self.message = message
+
+    def __str__(self):
+        return "Please provide the contact name"
