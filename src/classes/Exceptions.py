@@ -36,3 +36,8 @@ class IndexOutOfRangeException(Exception):
 
     def __str__(self):
         return "Please provide the contact name"
+
+class IncorrectAddressFormatException(Exception):
+    def __init__(self, message="Incorrect Address Format"):
+        self.message = message
+        super().__init__(self.message)
