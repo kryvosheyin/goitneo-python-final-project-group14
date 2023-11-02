@@ -2,6 +2,7 @@ from classes.Name import Name
 from classes.Phone import Phone
 from classes.Email import Email
 from classes.Birthday import Birthday
+from classes.address import Address
 
 class Record:
     def __init__(self, name: Name):
@@ -9,6 +10,7 @@ class Record:
         self.phones: list[Phone] = []
         self.email: Email = None
         self.birthday: Birthday = None
+        self.address: Address = None
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
@@ -41,6 +43,9 @@ class Record:
 
     def remove_email(self):
         self.email = None
+        
+    def add_address(self, address: Address):
+        self.address = address
 
     def get_phones_list(self):
         return ";".join(p.value for p in self.phones)
@@ -54,4 +59,6 @@ class Record:
 
     def __str__(self):
         birthday_str = str(self.birthday) if self.birthday else "Not set"
-        return f"Contact name: {self.name.value}, phones: {';' .join(p.value for p in self.phones)}, birthday: {birthday_str}"
+        address_str = str(self.address) if self.address else "Not set"  # Use self.address
+        return f"Contact name: {self.name.value}, phones: {';'.join(p.value for p in self.phones)}, birthday: {birthday_str}, address: {address_str}"
+
