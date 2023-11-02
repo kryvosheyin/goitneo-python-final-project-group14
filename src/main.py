@@ -16,6 +16,7 @@ from classes.address import Address
 from classes.help_command import HelpCommand
 import pickle
 import difflib
+import readline
 import render
 
 
@@ -339,6 +340,15 @@ def main():
         "all": get_all,
         "find": find,
     }
+
+    def completer(text, state):
+        options = [i for i in COMMANDS if i.startswith(text)]
+        if state < len(options):
+            return options[state]
+        return None
+
+    readline.parse_and_bind("bind ^I rl_complete")
+    readline.set_completer(completer)
 
     print("Welcome to the assistant bot!")
     render.render_help(help)
