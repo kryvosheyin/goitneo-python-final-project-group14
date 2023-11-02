@@ -4,6 +4,7 @@ from classes.Exceptions import (
     UnableToEditPhoneException,
     BirthdayFormatException,
     IndexOutOfRangeException,
+    NotFoundCommand,
 )
 from classes.AddressBook import AddressBook
 from classes.Name import Name
@@ -12,6 +13,7 @@ from classes.Email import Email
 from classes.Birthday import Birthday
 from classes.birthdays import get_upcoming_birthdays
 import pickle
+import difflib
 
 
 def input_error(func):
@@ -27,6 +29,7 @@ def input_error(func):
             UnableToEditPhoneException,
             BirthdayFormatException,
             IndexOutOfRangeException,
+            NotFoundCommand,
         ) as err:
             return str(err)
 
@@ -36,6 +39,7 @@ def input_error(func):
 def parse_input(user_input):
     cmd, *args = user_input.split(" ")
     cmd = cmd.strip().lower()
+    args = [arg for arg in args if arg.strip() != ""]
     return cmd, *args
 
 
@@ -90,7 +94,11 @@ def edit_email(contact: Record, args):
     email, _args = extract_arguments("missing new email value")(args)
     old_email_exists = contact.email
     contact.email = Email(email)
-    return f"Email changed for {contact.name}" if old_email_exists else f"Email added to {contact.name}"
+    return (
+        f"Email changed for {contact.name}"
+        if old_email_exists
+        else f"Email added to {contact.name}"
+    )
 
 
 @input_error
@@ -99,8 +107,7 @@ def edit_birthday(contact: Record, args):
     try:
         day, month, year = date_of_birth.split(".")
     except ValueError:
-        raise ValueError(
-            "Please provide name and date of birth in format DD.MM.YYY")
+        raise ValueError("Please provide name and date of birth in format DD.MM.YYY")
     contact.birthday = Birthday(int(year), int(month), int(day))
     return f"Birthday chenged to {contact.birthday} for {contact.name}"
 
@@ -132,21 +139,26 @@ def remove(address_book: AddressBook, args):
 @input_error
 def edit(address_book: AddressBook, args):
     EDIT_COMMANDS = {
-        'phone': edit_phone,
-        'email': edit_email,
-        'birthday': edit_birthday,
-        'name': edit_name,
+        "phone": edit_phone,
+        "email": edit_email,
+        "birthday": edit_birthday,
+        "name": edit_name,
     }
     extract_contact_name = extract_arguments("Please provide contact name")
     name, args = extract_contact_name(args)
     contact = address_book.find(name)
     extract_command = extract_arguments(
-        f"Command is missing. Please use: edit [name] [command] [args]. Available commands: {', '.join(EDIT_COMMANDS.keys())}")
+        f"Command is missing. Please use: edit [name] [command] [args]. Available commands: {', '.join(EDIT_COMMANDS.keys())}"
+    )
     command, args = extract_command(args)
-    if command == 'name':
-        status = EDIT_COMMANDS[command.lower()](address_book, contact, args)
+    predicted_command = get_closest_match(command, EDIT_COMMANDS)
+    if predicted_command is None:
+        raise NotFoundCommand(f"Could not recognize the action to apply for {name}")
+
+    if predicted_command == "name":
+        status = EDIT_COMMANDS[predicted_command.lower()](address_book, contact, args)
     else:
-        status = EDIT_COMMANDS[command.lower()](contact, args)
+        status = EDIT_COMMANDS[predicted_command.lower()](contact, args)
     print(status)
 
 
@@ -157,6 +169,7 @@ def extract_arguments(error_msg: str):
             return value, args
         except ValueError as e:
             raise ValueError(error_msg)
+
     return decorator
 
 
@@ -252,6 +265,13 @@ def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
         return AddressBook()
 
 
+def get_closest_match(command, COMMANDS):
+    """Returns the closest matching command from COMMANDS dictionary."""
+
+    closest_match = difflib.get_close_matches(command, COMMANDS.keys(), n=1, cutoff=0.6)
+    return closest_match[0] if closest_match else None
+
+
 help = """
 Available commands:
 Exit - 'close' or 'exit'
@@ -294,7 +314,7 @@ def main():
     print("Welcome to the assistant bot!")
     print(help)
     while True:
-        user_input = input("Enter a command: ")
+        user_input = input("\n\nEnter a command: ").strip()
         command, *args = parse_input(user_input)
         if command in ["close", "exit"]:
             print("Saving contacts..")
@@ -306,7 +326,11 @@ def main():
             if result:
                 print(result)
         else:
-            print("Invalid command.")
+            predicted_command = get_closest_match(command, COMMANDS)
+            if predicted_command:
+                print(f"Did you mean {predicted_command}? ")
+            else:
+                print("Invalid command.")
 
 
 if __name__ == "__main__":
