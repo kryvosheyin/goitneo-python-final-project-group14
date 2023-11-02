@@ -12,6 +12,7 @@ from classes.Record import Record
 from classes.Email import Email
 from classes.Birthday import Birthday
 from classes.birthdays import get_upcoming_birthdays
+from classes.Address import Address
 import pickle
 
 
@@ -142,9 +143,10 @@ def show_birthday(address_book: AddressBook, args):
 
 @input_error
 def add_address(address_book: AddressBook, args):
-    name, address = extract_args(args)
+    name, *address_args = args
+    address = " ".join(address_args)
     contact = address_book.find(name)
-    contact.address = address
+    contact.add_address(Address(address))
     return f"Address added to {contact.name}"
 
 
