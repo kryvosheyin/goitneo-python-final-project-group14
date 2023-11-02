@@ -1,4 +1,6 @@
+from classes.Fields import Field
 from classes.Exceptions import IncorrectAddressFormatException
+
 
 class Address(Field):
     def __init__(self, value):
