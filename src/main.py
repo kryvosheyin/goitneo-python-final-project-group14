@@ -5,6 +5,7 @@ from classes.Exceptions import (
     BirthdayFormatException,
     IndexOutOfRangeException,
     NotFoundCommand,
+    IncorrectAddressFormatException
 )
 from classes.AddressBook import AddressBook
 from classes.Name import Name
@@ -12,6 +13,7 @@ from classes.Record import Record
 from classes.Email import Email
 from classes.Birthday import Birthday
 from classes.birthdays import get_upcoming_birthdays
+from classes.address import Address
 import pickle
 import difflib
 
@@ -30,6 +32,7 @@ def input_error(func):
             BirthdayFormatException,
             IndexOutOfRangeException,
             NotFoundCommand,
+            IncorrectAddressFormatException,
         ) as err:
             return str(err)
 
@@ -182,6 +185,15 @@ def show_birthday(address_book: AddressBook, args):
     return contact.birthday
 
 
+@input_error
+def add_address(address_book: AddressBook, args):
+    name, *address_args = args
+    address = " ".join(address_args)
+    contact = address_book.find(name)
+    contact.add_address(Address(address))
+    return f"Address added to {contact.name}"
+
+
 def get_all(address_book: AddressBook, _):
     print(f"{'_'*135}")
     print(f"|{'Name:':^40}|{'Phone:':^30}|{'Email:':^30}|{'Birthday:':^30}|")
@@ -288,7 +300,8 @@ Find contacts by value - 'find' <value containing in any field>
 Remove email - 'remove-email' <name without spaces>
 Get Birthday of contact - 'show-birthday' <name without spaces>
 Get list of contacts to be congratulated next week - 'birthdays'
-Remove contact - 'remove' <name without spaces> 
+Remove contact - 'remove' <name without spaces>
+Add address - 'add-address' <name without spaces> <address> 
 Print all contacts - 'all'            
         """
 
@@ -307,6 +320,7 @@ def main():
         "show-birthday": show_birthday,
         "birthdays": birthdays,
         "remove": remove,
+        "add-address": add_address,
         "all": get_all,
         "find": find,
     }

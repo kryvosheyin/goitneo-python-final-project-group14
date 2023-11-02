@@ -44,3 +44,8 @@ class NotFoundCommand(Exception):
 
     def __str__(self) -> str:
         return self.message
+    
+class IncorrectAddressFormatException(Exception):
+    def __init__(self, message="Incorrect Address Format"):
+        self.message = message
+        super().__init__(self.message)
