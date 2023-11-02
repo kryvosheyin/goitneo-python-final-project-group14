@@ -57,4 +57,4 @@ class Record:
     def __str__(self):
         birthday_str = str(self.birthday) if self.birthday else "Not set"
         address_str = str(self.address) if self.address else "Not set"
-        return f"Contact name: {self.name.value}, phones: {';' .join(p.value for p in self.phones)}, birthday: {birthday_str}", address: {address_str}"
+        return f"Contact name: {self.name.value}, phones: {';' .join(p.value for p in self.phones)}, birthday: {birthday_str}, address: {address_str}"
