@@ -5,7 +5,7 @@ from classes.Exceptions import (
     BirthdayFormatException,
     IndexOutOfRangeException,
     NotFoundCommand,
-    IncorrectAddressFormatException
+    IncorrectAddressFormatException,
 )
 from classes.AddressBook import AddressBook
 from classes.Name import Name
@@ -65,7 +65,8 @@ def print_help_message(_, args):
 @input_error
 def add_contact(address_book: AddressBook, args):
     name, phone, *args = extract_argument(
-        "Please provide name and phone", args, number_values=2)
+        "Please provide name and phone", args, number_values=2
+    )
     contact = Record(name)
     contact.add_phone(phone)
     address_book.add_record(contact)
@@ -75,7 +76,8 @@ def add_contact(address_book: AddressBook, args):
 @input_error
 def add_phone(address_book: AddressBook, args):
     name, phone, *args = extract_argument(
-        "Please provide name and phone", args, number_values=2)
+        "Please provide name and phone", args, number_values=2
+    )
     contact = address_book.find(name)
     contact.add_phone(phone)
     return f"Phone {phone} added to contact {contact.name}"
@@ -120,8 +122,7 @@ def edit_birthday(contact: Record, args):
     try:
         day, month, year = date_of_birth.split(".")
     except ValueError:
-        raise ValueError(
-            "Please provide name and date of birth in format DD.MM.YYY")
+        raise ValueError("Please provide name and date of birth in format DD.MM.YYY")
     contact.set_birthday(int(year), int(month), int(day))
     return f"Birthday changed to {contact.birthday} for {contact.name}"
 
@@ -175,16 +176,14 @@ def edit(address_book: AddressBook, args):
     contact = address_book.find(name)
     command, args = extract_argument(
         f"Command is missing. Please use: edit [name] [command] [args]. Available commands: {', '.join(EDIT_COMMANDS.keys())}",
-        args
+        args,
     )
     predicted_command = get_closest_match(command, EDIT_COMMANDS)
     if predicted_command is None:
-        raise NotFoundCommand(
-            f"Could not recognize the action to apply for {name}")
+        raise NotFoundCommand(f"Could not recognize the action to apply for {name}")
 
     if predicted_command == "name":
-        status = EDIT_COMMANDS[predicted_command.lower()](
-            address_book, contact, args)
+        status = EDIT_COMMANDS[predicted_command.lower()](address_book, contact, args)
     else:
         status = EDIT_COMMANDS[predicted_command.lower()](contact, args)
     print(status)
@@ -202,7 +201,8 @@ def show_birthday(address_book: AddressBook, args):
 @input_error
 def add_address(address_book: AddressBook, args):
     name, *address_args = extract_argument(
-        "Please provide name and address", args, number_values=2)
+        "Please provide name and address", args, number_values=2
+    )
     address = " ".join(address_args)
     contact = address_book.find(name)
     contact.set_address(Address(address))
@@ -218,16 +218,14 @@ def render_contacts(records: [Record], _):
 
 
 def birthdays(address_book: AddressBook, _):
-    number_of_days = int(
-        input("Please enter the number of days you want to check: "))
-    birthday_dict = get_upcoming_birthdays(
-        address_book.data.values(), number_of_days)
+    number_of_days = int(input("Please enter the number of days you want to check: "))
+    birthday_dict = get_upcoming_birthdays(address_book.data.values(), number_of_days)
     result = {}
     if birthday_dict:
         sorted_days = sorted(birthday_dict)
         for day in sorted_days:
             if day in birthday_dict:
-                result[day.strftime('%d %B')] = ', '.join(birthday_dict[day])
+                result[day.strftime("%d %B")] = ", ".join(birthday_dict[day])
     render.render_birhtdays(result, number_of_days)
 
 
@@ -278,8 +276,7 @@ def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
 def get_closest_match(command, COMMANDS):
     """Returns the closest matching command from COMMANDS dictionary."""
 
-    closest_match = difflib.get_close_matches(
-        command, COMMANDS.keys(), n=1, cutoff=0.6)
+    closest_match = difflib.get_close_matches(command, COMMANDS.keys(), n=1, cutoff=0.6)
     return closest_match[0] if closest_match else None
 
 
@@ -288,36 +285,51 @@ help = [
     HelpCommand("Start work", "'hello'"),
     HelpCommand("Get help. List of available commands", "'help'"),
     HelpCommand("Get help. Search commands by text", "'help' {value to search}"),
-    HelpCommand("Add new contact",
-                "'add' {contact's name without spaces} {phone}"),
-    HelpCommand("Remove existing contact",
-                "'remove {contact's name without spaces}"),
-    HelpCommand("Find contacts by value",
-                "'find' {value containing in any field}"),
-    HelpCommand("Add new phone to existing contact",
-                "'add-phone' {contact's name without spaces} {phone}"),
-    HelpCommand("Remove all phones from existing contact",
-                "'remove-phone' {contact's name without spaces}"),
-    HelpCommand("Edit phone of existing contact",
-                "'edit' {contact's name without spaces} phone {new phone}"),
-    HelpCommand("Add/edit email of existing contact",
-                "'edit' {contact's name without spaces} email {new email}"),
-    HelpCommand("Remove email of existing contact",
-                "'get-phone' {contact's name without spaces}"),
-    HelpCommand("Add/edit birthday of existing contact",
-                "'edit' {contact's name without spaces} birthday {date in format DD.MM.YYYY}"),
-    HelpCommand("Get birthday of existing contact",
-                "'show-birthday' {contact's name without spaces}"),
-    HelpCommand("Edit name of existing contact",
-                "'edit' {contact's name without spaces} name {new name}"),
-    HelpCommand("Add address to existing contact",
-                "'add-address' {contact's name without spaces} {new address}"),
-    HelpCommand("Edit address of existing contact",
-                "'edit' {contact's name without spaces} address {new address}"),
+    HelpCommand("Add new contact", "'add' {contact's name without spaces} {phone}"),
+    HelpCommand("Remove existing contact", "'remove {contact's name without spaces}"),
+    HelpCommand("Find contacts by value", "'find' {value containing in any field}"),
     HelpCommand(
-        "Get list of contacts to be congratulated next week", "'birthdays'"),
-    HelpCommand("Remove existing contact",
-                "'remove' {contact's name without spaces}"),
+        "Add new phone to existing contact",
+        "'add-phone' {contact's name without spaces} {phone}",
+    ),
+    HelpCommand(
+        "Remove all phones from existing contact",
+        "'remove-phone' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Edit phone of existing contact",
+        "'edit' {contact's name without spaces} phone {new phone}",
+    ),
+    HelpCommand(
+        "Add/edit email of existing contact",
+        "'edit' {contact's name without spaces} email {new email}",
+    ),
+    HelpCommand(
+        "Remove email of existing contact",
+        "'get-phone' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Add/edit birthday of existing contact",
+        "'edit' {contact's name without spaces} birthday {date in format DD.MM.YYYY}",
+    ),
+    HelpCommand(
+        "Get birthday of existing contact",
+        "'show-birthday' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Edit name of existing contact",
+        "'edit' {contact's name without spaces} name {new name}",
+    ),
+    HelpCommand(
+        "Add address to existing contact",
+        "'add-address' {contact's name without spaces} {new address}",
+    ),
+    HelpCommand(
+        "Edit address of existing contact",
+        "'edit' {contact's name without spaces} address {new address}",
+    ),
+    HelpCommand("Get list of contacts to be congratulated next week", "'birthdays'"),
+    HelpCommand("Remove existing contact", "'remove' {contact's name without spaces}"),
     HelpCommand("Print all contacts", "'all'"),
 ]
 
