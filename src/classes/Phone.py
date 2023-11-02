@@ -8,4 +8,4 @@ class Phone(Field):
         if len(value) == 10 and value.isdigit():
             self.value = value
         else:
-            raise IncorrectPhoneFormatException("Phone bumber must be 10 digits")
+            raise IncorrectPhoneFormatException("Phone number must be 10 digits")

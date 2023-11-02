@@ -35,4 +35,12 @@ class IndexOutOfRangeException(Exception):
         self.message = message
 
     def __str__(self):
-        return "Please provide the contact name"
+        return self.message
+
+
+class NotFoundCommand(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
+    def __str__(self) -> str:
+        return self.message
