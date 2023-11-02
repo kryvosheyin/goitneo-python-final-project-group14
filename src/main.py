@@ -14,6 +14,7 @@ from classes.Birthday import Birthday
 from classes.birthdays import get_upcoming_birthdays
 import pickle
 import difflib
+import readline
 
 
 def input_error(func):
@@ -310,6 +311,15 @@ def main():
         "all": get_all,
         "find": find,
     }
+
+    def completer(text, state):
+        options = [i for i in COMMANDS if i.startswith(text)]
+        if state < len(options):
+            return options[state]
+        return None
+
+    readline.parse_and_bind("bind ^I rl_complete")
+    readline.set_completer(completer)
 
     print("Welcome to the assistant bot!")
     print(help)
