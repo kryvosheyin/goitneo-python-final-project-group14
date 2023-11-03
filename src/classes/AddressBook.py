@@ -13,7 +13,7 @@ class AddressBook(UserDict):
     def add_note(self, note: Note):
         self.data[note.title.value] = note
 
-    def find(self, name: Name):
+    def find(self, name):
         contact = self.data.get(name)
         if contact is None:
             raise KeyError(f"Contact {name} is not found")
