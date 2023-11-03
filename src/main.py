@@ -56,7 +56,8 @@ def print_help_message(_, __):
 
 @input_error
 def add_contact(address_book: AddressBook, args):
-    name, phone = extract_args(args)
+    name, phone = extract_argument("Please provide name and phone", args, number_values=2)
+    print(f"{name} {phone}")
     contact = Record(name)
     contact.add_phone(phone)
     address_book.add_record(contact)
@@ -65,7 +66,7 @@ def add_contact(address_book: AddressBook, args):
 
 @input_error
 def add_phone(address_book: AddressBook, args):
-    name, phone = extract_args(args)
+    name, phone = extract_argument("Please provide name and phone", args, number_values=2)
     contact = address_book.find(name)
     contact.add_phone(phone)
     return f"Phone {phone} added to contact {contact.name}"
@@ -88,15 +89,15 @@ def get_phone(address_book: AddressBook, args):
 
 @input_error
 def edit_phone(contact: Record, args):
-    new_phone, args = extract_arguments("missing new phone value")(args)
+    new_phone, args = extract_argument("missing new phone value", args)
     return contact.edit_phone(new_phone)
 
 
 @input_error
 def edit_email(contact: Record, args):
-    email, _args = extract_arguments("missing new email value")(args)
+    email, args = extract_argument("missing new email value", args)
     old_email_exists = contact.email
-    contact.email = Email(email)
+    contact.set_email(Email(email))
     return (
         f"Email changed for {contact.name}"
         if old_email_exists
@@ -106,21 +107,34 @@ def edit_email(contact: Record, args):
 
 @input_error
 def edit_birthday(contact: Record, args):
-    date_of_birth, args = extract_arguments("missing new birthday value")(args)
+    date_of_birth, args = extract_argument("missing new birthday value", args)
     try:
         day, month, year = date_of_birth.split(".")
     except ValueError:
-        raise ValueError("Please provide name and date of birth in format DD.MM.YYY")
-    contact.birthday = Birthday(int(year), int(month), int(day))
+        raise ValueError(
+            "Please provide name and date of birth in format DD.MM.YYY")
+    contact.set_birthday(int(year), int(month), int(day))
     return f"Birthday chenged to {contact.birthday} for {contact.name}"
 
 
 def edit_name(address_book: AddressBook, contact: Record, args):
-    name, args = extract_arguments("missing new name")(args)
+    name, args = extract_argument("missing new name", args)
     address_book.delete(contact.name)
     contact.name = Name(name)
     address_book.add_record(contact)
     return f"Name changed to {contact.name}"
+
+
+def edit_address(contact: Record, args):
+    address = extract_argument("missing new address", args, number_values=0)
+    address = " ".join(address)
+    old_address_exists = contact.address
+    contact.set_address(Address(address))
+    return (
+        f"Address changed for {contact.name}"
+        if old_address_exists
+        else f"Address added to {contact.name}"
+    )
 
 
 @input_error
@@ -146,34 +160,25 @@ def edit(address_book: AddressBook, args):
         "email": edit_email,
         "birthday": edit_birthday,
         "name": edit_name,
+        "address": edit_address,
     }
-    extract_contact_name = extract_arguments("Please provide contact name")
-    name, args = extract_contact_name(args)
+    name, args = extract_argument("Please provide contact name", args)
     contact = address_book.find(name)
-    extract_command = extract_arguments(
-        f"Command is missing. Please use: edit [name] [command] [args]. Available commands: {', '.join(EDIT_COMMANDS.keys())}"
+    command, args = extract_argument(
+        f"Command is missing. Please use: edit [name] [command] [args]. Available commands: {', '.join(EDIT_COMMANDS.keys())}",
+        args
     )
-    command, args = extract_command(args)
     predicted_command = get_closest_match(command, EDIT_COMMANDS)
     if predicted_command is None:
-        raise NotFoundCommand(f"Could not recognize the action to apply for {name}")
+        raise NotFoundCommand(
+            f"Could not recognize the action to apply for {name}")
 
     if predicted_command == "name":
-        status = EDIT_COMMANDS[predicted_command.lower()](address_book, contact, args)
+        status = EDIT_COMMANDS[predicted_command.lower()](
+            address_book, contact, args)
     else:
         status = EDIT_COMMANDS[predicted_command.lower()](contact, args)
     print(status)
-
-
-def extract_arguments(error_msg: str):
-    def decorator(args):
-        try:
-            value, *args = args
-            return value, args
-        except ValueError as e:
-            raise ValueError(error_msg)
-
-    return decorator
 
 
 @input_error
@@ -187,10 +192,10 @@ def show_birthday(address_book: AddressBook, args):
 
 @input_error
 def add_address(address_book: AddressBook, args):
-    name, *address_args = args
+    name, *address_args = extract_argument("Please provide name and address", args, number_values=2)
     address = " ".join(address_args)
     contact = address_book.find(name)
-    contact.add_address(Address(address))
+    contact.set_address(Address(address))
     return f"Address added to {contact.name}"
 
 
@@ -218,8 +223,10 @@ def render_contacts(records: [Record], _):
 
 
 def birthdays(address_book: AddressBook, _):
-    number_of_days = int(input("Please enter the number of days you want to check: "))
-    birthday_dict = get_upcoming_birthdays(address_book.data.values(), number_of_days)
+    number_of_days = int(
+        input("Please enter the number of days you want to check: "))
+    birthday_dict = get_upcoming_birthdays(
+        address_book.data.values(), number_of_days)
     print(f"{'_'*73}")
     print(f"|{'Day:':^30}|{'Name:':^40}|")
     print(f"|{'_'*30}|{'_'*40}|")
@@ -237,19 +244,23 @@ def birthdays(address_book: AddressBook, _):
         print(f"|{'_'*71}|")
 
 
-def extract_name(args: list):
+def extract_argument(error_msg: str, args, number_values = 1):
     try:
-        return args[0]
-    except IndexError:
-        raise IndexError("Please provide contact name")
+        if number_values == 0:
+            if not args:
+                raise ValueError
+            return args
+        if number_values > 1:
+            (value1, value2, *args) = args
+            return (value1, value2, *args)
+        (value1, *args) = args
+        return (value1, args)
+    except ValueError as e:
+        raise ValueError(error_msg)
 
 
-def extract_args(args: list):
-    try:
-        name, phone = args
-    except ValueError:
-        raise ValueError("Please provide name and phone")
-    return name, phone
+def extract_name(args):
+    return extract_argument("Please provide contact name", args)
 
 
 def save_to_file(book: AddressBook, filename: str = "address_book.pkl"):
@@ -280,7 +291,8 @@ def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
 def get_closest_match(command, COMMANDS):
     """Returns the closest matching command from COMMANDS dictionary."""
 
-    closest_match = difflib.get_close_matches(command, COMMANDS.keys(), n=1, cutoff=0.6)
+    closest_match = difflib.get_close_matches(
+        command, COMMANDS.keys(), n=1, cutoff=0.6)
     return closest_match[0] if closest_match else None
 
 
@@ -295,6 +307,7 @@ Edit phone - 'edit' <name without spaces> phone <phone to replace> <new phone>
 Edit/add email - 'edit' <name without spaces> email <new email>
 Edit/add birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
 Edit name - 'edit' <name without spaces> name <new name>
+Edit address - 'edit' <name without spaces> address <new address>
 Get all phones for contact - 'get-phone' <name without spaces>
 Find contacts by value - 'find' <value containing in any field>
 Remove email - 'remove-email' <name without spaces>

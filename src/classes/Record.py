@@ -15,9 +15,6 @@ class Record:
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
 
-    def add_birthday(self, year, month, day):
-        self.birthday = Birthday(year, month, day)
-
     def edit_phone(self, new_phone):
         if len(self.phones) > 1:
             response = input(
@@ -43,9 +40,15 @@ class Record:
 
     def remove_email(self):
         self.email = None
-        
-    def add_address(self, address: Address):
+
+    def set_birthday(self, year, month, day):
+        self.birthday = Birthday(year, month, day)    
+    
+    def set_address(self, address: Address):
         self.address = address
+
+    def set_email(self, email: Email):
+        self.email = email
 
     def get_phones_list(self):
         return ";".join(p.value for p in self.phones)
