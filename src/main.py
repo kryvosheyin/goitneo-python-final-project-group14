@@ -309,6 +309,13 @@ def find_note(address_book: AddressBook, args):
     render.render_notes(notes_list)
 
 
+@input_error
+def edit_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    note = address_book.find_note(title_args)
+    note.edit_note(multi_line_input())
+
+
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
     try:
         with open(filename, "rb") as file:
@@ -369,6 +376,7 @@ def main():
         "all-notes": print_notes,
         "find-note": find_note,
         "delete-note": delete_note,
+        "edit-note": edit_note,
     }
 
     print("Welcome to the assistant bot!")

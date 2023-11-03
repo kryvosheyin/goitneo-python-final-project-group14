@@ -13,11 +13,9 @@ class Note:
         self.body = NoteBody(note_text)
 
     def edit_note(self, new_text):
-        existing_text = self.body.value
-        self.body = NoteBody(existing_text + "\n" + new_text)
-
-    def rename_note(self, new_title: Title):
-        self.title = Title(new_title)
+        existing_text = str(self.body.value)
+        self.body = NoteBody(str(existing_text) + "\n" + new_text)
+        return self
 
     def add_tag(self, tag: Tag):
         self.tags.append(tag)
