@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from collections import defaultdict
-from classes.Record import Record
+from classes.record.contact_record import Record
 
 
 def get_upcoming_birthdays(users, days):
