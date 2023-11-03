@@ -1,9 +1,9 @@
 from collections import UserDict
-from classes.Name import Name
-from classes.Record import Record
-from classes.Phone import Phone
-from classes.Fields import Field
-from classes.note import Note
+from classes.record.name_field import Name
+from classes.record.contact_record import Record
+from classes.record.phone_field import Phone
+from classes.fields import Field
+from classes.note.note import Note
 
 
 class AddressBook(UserDict):

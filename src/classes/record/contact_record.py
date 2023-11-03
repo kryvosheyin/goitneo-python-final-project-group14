@@ -1,8 +1,9 @@
-from classes.Name import Name
-from classes.Phone import Phone
-from classes.Email import Email
-from classes.Birthday import Birthday
-from classes.address import Address
+
+from classes.record.name_field import Name
+from classes.record.phone_field import Phone
+from classes.record.email_field import Email
+from classes.record.birthday_field import Birthday
+from classes.record.address_field import Address
 
 
 class Record:
@@ -26,8 +27,7 @@ class Record:
                 self.phones[int(response) - 1] = Phone(new_phone)
                 return f"Phone from {old_phone} changed to {new_phone} for {self.name}"
             except IndexError:
-                raise IndexError(
-                    "The number provided is not valid, please try again")
+                raise IndexError("The number provided is not valid, please try again")
         elif len(self.phones) == 1:
             old_phone = self.phones[0]
             self.phones[0] = Phone(new_phone)

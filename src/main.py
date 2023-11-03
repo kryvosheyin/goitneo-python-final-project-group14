@@ -1,4 +1,4 @@
-from classes.Exceptions import (
+from utils.custom_exceptions import (
     IncorrectNameException,
     IncorrectPhoneFormatException,
     UnableToEditPhoneException,
@@ -8,19 +8,19 @@ from classes.Exceptions import (
     IncorrectAddressFormatException,
     IncorrectTitleException,
 )
-from classes.AddressBook import AddressBook
-from classes.Name import Name
-from classes.Record import Record
-from classes.Email import Email
-from classes.birthdays import get_upcoming_birthdays
-from classes.address import Address
-from classes.help_command import HelpCommand
-from classes.note import Note
-from classes.note_body import NoteBody
-from classes.note_title import Title
+from classes.address_book import AddressBook
+from classes.record.name_field import Name
+from classes.record.contact_record import Record
+from classes.record.email_field import Email
+from utils.birthdays_calculator import get_upcoming_birthdays
+from classes.record.address_field import Address
+from utils.help_command import HelpCommand
+from classes.note.note import Note
+from classes.note.note_body import NoteBody
+from classes.note.note_title import Title
 import pickle
 import difflib
-import render
+import utils.render as render
 
 
 def input_error(func):

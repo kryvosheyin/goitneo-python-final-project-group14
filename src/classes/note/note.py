@@ -1,6 +1,6 @@
-from classes.note_title import Title
-from classes.note_body import NoteBody
-from classes.note_tags import Tag
+from classes.note.note_title import Title
+from classes.note.note_body import NoteBody
+from classes.note.note_tags import Tag
 
 
 class Note:

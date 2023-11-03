@@ -1,5 +1,5 @@
-from classes.Exceptions import IncorrectNameException
-from classes.Fields import Field
+from utils.custom_exceptions import IncorrectNameException
+from classes.fields import Field
 
 
 class Name(Field):

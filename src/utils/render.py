@@ -1,8 +1,8 @@
-from classes.Record import Record
-from classes.note import Note
+from classes.record.contact_record import Record
+from classes.note.note import Note
 from rich.console import Console
 from rich.table import Table, box
-from classes.help_command import HelpCommand
+from utils.help_command import HelpCommand
 
 
 def render_contacts(records: [Record], title="Contacts:"):

@@ -1,5 +1,5 @@
-from classes.Fields import Field
-from classes.Exceptions import IncorrectAddressFormatException
+from classes.fields import Field
+from utils.custom_exceptions import IncorrectAddressFormatException
 
 
 class Address(Field):
@@ -10,6 +10,6 @@ class Address(Field):
     def validate(self):
         if not self.value:
             raise IncorrectAddressFormatException("Address cannot be empty")
-    
+
     def __str__(self):
         return self.value
