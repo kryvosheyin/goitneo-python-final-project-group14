@@ -271,7 +271,7 @@ def find(book: AddressBook, args):
 @input_error
 def add_note(address_book: AddressBook, args):
     title_args = " ".join(args)
-    title = Title(title_args)
+    title = Title(title_args.strip())
     body_input = multi_line_input("Please enter the note text:")
     body = NoteBody(body_input)
     address_book.add_note(Note(title, body))
@@ -299,7 +299,11 @@ def multi_line_input(prompt="Enter text (press Enter twice to finish): "):
 def print_notes(address_book: AddressBook, _):
     for name, item in address_book.items():
         if type(item) is Note:
-            print(str(item))
+            print(item.title, item.body)
+
+
+def find_note(address_book: AddressBook, title):
+    pass
 
 
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
