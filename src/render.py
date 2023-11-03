@@ -1,4 +1,5 @@
 from classes.Record import Record
+from classes.note import Note
 from rich.console import Console
 from rich.table import Table
 
@@ -47,7 +48,8 @@ def render_notes(notes):
     table.add_column("Tags", justify="center")
 
     for note in notes:
-        table.add_row(note.title, note.body, ", ".join(note.get_note_tags()))
+        if type(note) is Note:
+            table.add_row(str(note.title), str(note.body), note.get_note_tags())
 
     console = Console()
     console.print(table)
