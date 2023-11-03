@@ -56,7 +56,7 @@ def print_help_message(_, __):
 
 @input_error
 def add_contact(address_book: AddressBook, args):
-    name, phone, args = extract_argument(
+    name, phone, *args = extract_argument(
         "Please provide name and phone", args, number_values=2)
     contact = Record(name)
     contact.add_phone(phone)
@@ -66,7 +66,7 @@ def add_contact(address_book: AddressBook, args):
 
 @input_error
 def add_phone(address_book: AddressBook, args):
-    name, phone, args = extract_argument(
+    name, phone, *args = extract_argument(
         "Please provide name and phone", args, number_values=2)
     contact = address_book.find(name)
     contact.add_phone(phone)
