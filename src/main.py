@@ -435,6 +435,7 @@ def main():
             print("Good bye!")
             break
         elif command in COMMANDS:
+            print(50 * "\n")
             result = COMMANDS[command](address_book, args)
             if result:
                 print(result)
