@@ -56,7 +56,8 @@ def print_help_message(_, __):
 
 @input_error
 def add_contact(address_book: AddressBook, args):
-    name, phone = extract_argument("Please provide name and phone", args, number_values=2)
+    name, phone = extract_argument(
+        "Please provide name and phone", args, number_values=2)
     print(f"{name} {phone}")
     contact = Record(name)
     contact.add_phone(phone)
@@ -66,7 +67,8 @@ def add_contact(address_book: AddressBook, args):
 
 @input_error
 def add_phone(address_book: AddressBook, args):
-    name, phone = extract_argument("Please provide name and phone", args, number_values=2)
+    name, phone = extract_argument(
+        "Please provide name and phone", args, number_values=2)
     contact = address_book.find(name)
     contact.add_phone(phone)
     return f"Phone {phone} added to contact {contact.name}"
@@ -192,7 +194,8 @@ def show_birthday(address_book: AddressBook, args):
 
 @input_error
 def add_address(address_book: AddressBook, args):
-    name, *address_args = extract_argument("Please provide name and address", args, number_values=2)
+    name, *address_args = extract_argument(
+        "Please provide name and address", args, number_values=2)
     address = " ".join(address_args)
     contact = address_book.find(name)
     contact.set_address(Address(address))
@@ -244,7 +247,7 @@ def birthdays(address_book: AddressBook, _):
         print(f"|{'_'*71}|")
 
 
-def extract_argument(error_msg: str, args, number_values = 1):
+def extract_argument(error_msg: str, args, number_values=1):
     try:
         if number_values == 0:
             if not args:

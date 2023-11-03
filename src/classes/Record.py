@@ -4,6 +4,7 @@ from classes.Email import Email
 from classes.Birthday import Birthday
 from classes.address import Address
 
+
 class Record:
     def __init__(self, name: Name):
         self.name = Name(name)
@@ -25,7 +26,8 @@ class Record:
                 self.phones[int(response) - 1] = Phone(new_phone)
                 return f"Phone from {old_phone} changed to {new_phone} for {self.name}"
             except IndexError:
-                raise IndexError("The number provided is not valid, please try again")
+                raise IndexError(
+                    "The number provided is not valid, please try again")
         elif len(self.phones) == 1:
             old_phone = self.phones[0]
             self.phones[0] = Phone(new_phone)
@@ -42,8 +44,8 @@ class Record:
         self.email = None
 
     def set_birthday(self, year, month, day):
-        self.birthday = Birthday(year, month, day)    
-    
+        self.birthday = Birthday(year, month, day)
+
     def set_address(self, address: Address):
         self.address = address
 
@@ -62,6 +64,6 @@ class Record:
 
     def __str__(self):
         birthday_str = str(self.birthday) if self.birthday else "Not set"
-        address_str = str(self.address) if self.address else "Not set"  # Use self.address
+        # Use self.address
+        address_str = str(self.address) if self.address else "Not set"
         return f"Contact name: {self.name.value}, phones: {';'.join(p.value for p in self.phones)}, birthday: {birthday_str}, address: {address_str}"
-
