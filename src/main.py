@@ -216,6 +216,7 @@ def render_contacts(records: [Record], _):
 
 def birthdays(address_book: AddressBook, _):
     number_of_days = int(input("Please enter the number of days you want to check: "))
+
     birthday_dict = get_upcoming_birthdays(address_book.data.values(), number_of_days)
     result = {}
     if birthday_dict:
@@ -263,7 +264,7 @@ def find(book: AddressBook, args):
 
 @input_error
 def add_note(address_book: AddressBook, args):
-    title_args = " ".join(args)
+    title_args = " ".join(args).strip()
     title = Title(title_args.strip())
     body_input = multi_line_input("Please enter the note text:")
     body = NoteBody(body_input)
@@ -293,8 +294,19 @@ def print_notes(address_book: AddressBook, _):
     render.render_notes(address_book.data.values())
 
 
-def find_note(address_book: AddressBook, title):
-    pass
+@input_error
+def delete_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    address_book.delete_note(title_args)
+    return "Note was deleted"
+
+
+@input_error
+def find_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    notes_list = list()
+    notes_list.append(address_book.find_note(title_args))
+    render.render_notes(notes_list)
 
 
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
@@ -355,10 +367,13 @@ def main():
         "find": find,
         "add-note": add_note,
         "all-notes": print_notes,
+        "find-note": find_note,
+        "delete-note": delete_note,
     }
 
     print("Welcome to the assistant bot!")
     print(help)
+
     while True:
         user_input = input("\n\nEnter a command: ").strip()
         command, *args = parse_input(user_input)

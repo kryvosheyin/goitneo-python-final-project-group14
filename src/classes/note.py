@@ -6,8 +6,8 @@ from classes.note_tags import Tag
 class Note:
     def __init__(self, title: Title, body: NoteBody = None):
         self.title = Title(title)
-        self.body: NoteBody = body
-        self.tags = ["one", "two"]
+        self.body = NoteBody(body)
+        self.tags = []
 
     def add_note(self, note_text):
         self.body = NoteBody(note_text)

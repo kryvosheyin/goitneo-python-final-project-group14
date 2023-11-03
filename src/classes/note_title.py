@@ -3,14 +3,17 @@ from classes.Exceptions import IncorrectTitleException
 
 
 class Title(Field):
-    def __init__(self, value):
-        if len(value) > 120:
+    def __init__(self, title):
+        Title.validate(title)
+        super().__init__(title)
+
+    def validate(title: str):
+        if len(title) > 120:
             raise IncorrectTitleException("Title must not exceed 120 characters")
-        elif value == "":
+        elif title == "":
             raise IncorrectTitleException(
                 "Title has to have at least one character that is not space"
             )
-        self.value = value
 
     def __len__(self):
         return len(self.value)
