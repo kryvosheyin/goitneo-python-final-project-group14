@@ -30,7 +30,8 @@ def render_birhtdays(dictionaly: dict, days: int):
 
     for day, names in dictionaly.items():
         table.add_row(day, names)
-        console = Console()
+    
+    console = Console()
     console.print(table)
     console.print(f"Found days: {len(dictionaly.keys())}")
 
