@@ -28,7 +28,6 @@ class AddressBook(UserDict):
     def find_note(self, title):
         all_notes = self.filter_by_class(Note)
         note = all_notes.get(str(title))
-        print((note.title))
         if note is None:
             raise KeyError(f"Note title {title} does not exist")
         return note
