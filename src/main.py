@@ -223,6 +223,7 @@ def render_contacts(records: [Record], _):
 
 def birthdays(address_book: AddressBook, _):
     number_of_days = int(input("Please enter the number of days you want to check: "))
+
     birthday_dict = get_upcoming_birthdays(address_book.data.values(), number_of_days)
     result = {}
     if birthday_dict:
@@ -270,7 +271,7 @@ def find(book: AddressBook, args):
 
 @input_error
 def add_note(address_book: AddressBook, args):
-    title_args = " ".join(args)
+    title_args = " ".join(args).strip()
     title = Title(title_args.strip())
     body_input = multi_line_input("Please enter the note text:")
     body = NoteBody(body_input)
@@ -300,8 +301,19 @@ def print_notes(address_book: AddressBook, _):
     render.render_notes(address_book.data.values())
 
 
-def find_note(address_book: AddressBook, title):
-    pass
+@input_error
+def delete_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    address_book.delete_note(title_args)
+    return "Note was deleted"
+
+
+@input_error
+def find_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    notes_list = list()
+    notes_list.append(address_book.find_note(title_args))
+    render.render_notes(notes_list)
 
 
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
@@ -325,36 +337,51 @@ help = [
     HelpCommand("Start work", "'hello'"),
     HelpCommand("Get help. List of available commands", "'help'"),
     HelpCommand("Get help. Search commands by text", "'help' {value to search}"),
-    HelpCommand("Add new contact",
-                "'add' {contact's name without spaces} {phone}"),
-    HelpCommand("Remove existing contact",
-                "'remove {contact's name without spaces}"),
-    HelpCommand("Find contacts by value",
-                "'find' {value containing in any field}"),
-    HelpCommand("Add new phone to existing contact",
-                "'add-phone' {contact's name without spaces} {phone}"),
-    HelpCommand("Remove all phones from existing contact",
-                "'remove-phone' {contact's name without spaces}"),
-    HelpCommand("Edit phone of existing contact",
-                "'edit' {contact's name without spaces} phone {new phone}"),
-    HelpCommand("Add/edit email of existing contact",
-                "'edit' {contact's name without spaces} email {new email}"),
-    HelpCommand("Remove email of existing contact",
-                "'get-phone' {contact's name without spaces}"),
-    HelpCommand("Add/edit birthday of existing contact",
-                "'edit' {contact's name without spaces} birthday {date in format DD.MM.YYYY}"),
-    HelpCommand("Get birthday of existing contact",
-                "'show-birthday' {contact's name without spaces}"),
-    HelpCommand("Edit name of existing contact",
-                "'edit' {contact's name without spaces} name {new name}"),
-    HelpCommand("Add address to existing contact",
-                "'add-address' {contact's name without spaces} {new address}"),
-    HelpCommand("Edit address of existing contact",
-                "'edit' {contact's name without spaces} address {new address}"),
+    HelpCommand("Add new contact", "'add' {contact's name without spaces} {phone}"),
+    HelpCommand("Remove existing contact", "'remove {contact's name without spaces}"),
+    HelpCommand("Find contacts by value", "'find' {value containing in any field}"),
     HelpCommand(
-        "Get list of contacts to be congratulated next week", "'birthdays'"),
-    HelpCommand("Remove existing contact",
-                "'remove' {contact's name without spaces}"),
+        "Add new phone to existing contact",
+        "'add-phone' {contact's name without spaces} {phone}",
+    ),
+    HelpCommand(
+        "Remove all phones from existing contact",
+        "'remove-phone' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Edit phone of existing contact",
+        "'edit' {contact's name without spaces} phone {new phone}",
+    ),
+    HelpCommand(
+        "Add/edit email of existing contact",
+        "'edit' {contact's name without spaces} email {new email}",
+    ),
+    HelpCommand(
+        "Remove email of existing contact",
+        "'get-phone' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Add/edit birthday of existing contact",
+        "'edit' {contact's name without spaces} birthday {date in format DD.MM.YYYY}",
+    ),
+    HelpCommand(
+        "Get birthday of existing contact",
+        "'show-birthday' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Edit name of existing contact",
+        "'edit' {contact's name without spaces} name {new name}",
+    ),
+    HelpCommand(
+        "Add address to existing contact",
+        "'add-address' {contact's name without spaces} {new address}",
+    ),
+    HelpCommand(
+        "Edit address of existing contact",
+        "'edit' {contact's name without spaces} address {new address}",
+    ),
+    HelpCommand("Get list of contacts to be congratulated next week", "'birthdays'"),
+    HelpCommand("Remove existing contact", "'remove' {contact's name without spaces}"),
     HelpCommand("Print all contacts", "'all'"),
 ]
 
@@ -378,6 +405,8 @@ def main():
         "find": find,
         "add-note": add_note,
         "all-notes": print_notes,
+        "find-note": find_note,
+        "delete-note": delete_note,
     }
 
     print("Welcome to the assistant bot!")

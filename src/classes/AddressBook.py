@@ -11,13 +11,33 @@ class AddressBook(UserDict):
         self.data[str(record.name)] = record
 
     def add_note(self, note: Note):
-        self.data[note.title.value] = note
+        self.data[str(note.title)] = note
+
+    def filter_by_class(self, class_type):
+        return {
+            key: value for key, value in self.items() if isinstance(value, class_type)
+        }
 
     def find(self, name):
-        contact = self.data.get(name)
+        all_contacts = self.filter_by_class(Record)
+        contact = all_contacts.get(name)
         if contact is None:
             raise KeyError(f"Contact {name} is not found")
         return contact
+
+    def find_note(self, title):
+        all_notes = self.filter_by_class(Note)
+        note = all_notes.get(str(title))
+        if note is None:
+            raise KeyError(f"Note title {title} does not exist")
+        return note
+
+    def delete_note(self, title):
+        note = self.find_note(title)
+        try:
+            del self.data[str(note.title)]
+        except:
+            raise KeyError("Title does not exist")
 
     def find_all(self, value: str) -> [Record]:
         search_result = []
