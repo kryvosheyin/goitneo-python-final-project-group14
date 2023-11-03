@@ -1,6 +1,7 @@
 from classes.Record import Record
 from rich.console import Console
-from rich.table import Table
+from rich.table import Table, box
+from classes.help_command import HelpCommand
 
 
 def render_contacts(records: [Record], title="Contacts:"):
@@ -24,17 +25,20 @@ def render_contacts(records: [Record], title="Contacts:"):
     console.print(f"Found contacts: {len(records)}")
 
 
-def render_birhtdays(dictionaly: dict, days: int):
+def render_birhtdays(dictionary: dict, days: int):
     table = Table(title=f"Birthdays in next {days} days:", show_lines=True)
     table.add_column("Day", justify="center", style="magenta")
     table.add_column("Names", justify="center")
 
-    for day, names in dictionaly.items():
+    for day, names in dictionary.items():
         table.add_row(day, names)
     
     console = Console()
     console.print(table)
-    console.print(f"Found days: {len(dictionaly.keys())}")
+    if len(dictionary.keys())>0:
+        console.print(f"Found days: {len(dictionary.keys())}")
+    else:
+        console.print(f"No one should be concratulated in {days} days") 
 
 
 def render_notes(notes):
@@ -49,6 +53,17 @@ def render_notes(notes):
     console = Console()
     console.print(table)
     console.print(f"Found notes: {len(notes)}")
+
+def render_help(commands: [HelpCommand]):
+    table = Table(title=f"Avaliable commands:", show_lines=True, box=box.SQUARE_DOUBLE_HEAD)
+    table.add_column("Description")
+    table.add_column("Command", style="magenta")
+
+    for cmd in commands:
+        table.add_row(cmd.desc, cmd.cmd)
+
+    console = Console()
+    console.print(table)
 
 
 def __get_if_empty(value):
