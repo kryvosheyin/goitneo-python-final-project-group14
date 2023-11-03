@@ -285,8 +285,8 @@ def get_closest_match(command, COMMANDS):
 help = [
     HelpCommand("Exit", "'close' or 'exit'"),
     HelpCommand("Start work", "'hello'"),
-    HelpCommand("Get help. List of available commands", "'hello'"),
-    HelpCommand("Get help. Search commands by text", "'hello' {value to search}"),
+    HelpCommand("Get help. List of available commands", "'help'"),
+    HelpCommand("Get help. Search commands by text", "'help' {value to search}"),
     HelpCommand("Add new contact",
                 "'add' {contact's name without spaces} {phone}"),
     HelpCommand("Remove existing contact",
