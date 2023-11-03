@@ -20,9 +20,9 @@
 Боту потрібні зовнішні бібліотеки:
 <table>
   <tr>
-    <th>Dependency name</th>
-    <th>Installation</th>
-    <th>Reference</th>
+    <th>Залежність</th>
+    <th>Команда для інсталяції</th>
+    <th>Посилання</th>
   </tr>
     <tr>
     <th>rich</th>
@@ -33,21 +33,13 @@
 
 Щоб встановити всі необхідні залежності, виконайте <b>pip install -r requirements.txt</b>
 
-2. Клонуйте репозиторій на свій комп'ютер:
-
-   ```bash
-   git clone https://github.com/kryvosheyin/goitneo-python-final-project-group14.git
-
-Встановіть необхідні залежності:
-pip install -r requirements.txt
-
 ## Використання:
 Запустіть програму:
 python main.py
 
 Дотримуйтесь інструкцій, що виводяться на екрані, щоб користуватися Персональним помічником:
 
-Available commands:
+Доступні команди:
 ![image](https://github.com/kryvosheyin/goitneo-python-final-project-group14/assets/143953227/4236d61d-1979-4a78-b739-c5ed52668973)
 
 
