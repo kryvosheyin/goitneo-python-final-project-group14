@@ -13,12 +13,15 @@ def render_contacts(records: [Record], title="Contacts:"):
     table.add_column("Birthday", justify="center")
     table.add_column("Address", justify="center")
     for record in records:
-        record: Record = record
-        table.add_row(__get_if_empty(record.name),
-                      __get_if_empty(record.get_phones_list()),
-                      __get_if_empty(record.email),
-                      __get_if_empty(record.birthday),
-                      __get_if_empty(record.address))
+        if type(record) is Record:
+            record: Record = record
+            table.add_row(
+                __get_if_empty(record.name),
+                __get_if_empty(record.get_phones_list()),
+                __get_if_empty(record.email),
+                __get_if_empty(record.birthday),
+                __get_if_empty(record.address),
+            )
 
     console = Console()
     console.print(table)
@@ -32,7 +35,7 @@ def render_birhtdays(dictionary: dict, days: int):
 
     for day, names in dictionary.items():
         table.add_row(day, names)
-    
+
     console = Console()
     console.print(table)
     if len(dictionary.keys())>0:
