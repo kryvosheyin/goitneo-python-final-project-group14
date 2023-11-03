@@ -19,6 +19,8 @@ import difflib
 import platform
 import render
 
+import platform
+
 
 def input_error(func):
     def inner(*args, **kwargs):
