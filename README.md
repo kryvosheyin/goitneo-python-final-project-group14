@@ -10,11 +10,11 @@ Bot requires external libraries:
     <th>Reference</th>
   </tr>
     <tr>
-    <th>Dependency name</th>
+    <th>rich</th>
     <th><b>pip install rich</b></th>
     <th><a href="https://rich.readthedocs.io/en/stable/index.html">reference</a></th>
   </tr>
 </table>
 
-To install all required dependencies please <b>pip install -r requirements.txt</b>
+To install all required dependencies please run <b>pip install -r requirements.txt</b>
 
