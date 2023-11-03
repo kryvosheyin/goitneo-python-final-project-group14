@@ -13,6 +13,7 @@ from classes.Record import Record
 from classes.Email import Email
 from classes.birthdays import get_upcoming_birthdays
 from classes.address import Address
+from classes.help_command import HelpCommand
 import pickle
 import difflib
 import render
@@ -50,8 +51,14 @@ def print_hello(_, __):
     return "How can I help you?"
 
 
-def print_help_message(_, __):
-    print(help)
+def print_help_message(_, args):
+    search_arg = " ".join(args).lower()
+    print(search_arg)
+    result = []
+    for i in help:
+        if i.desc.lower().find(search_arg) > -1 or i.cmd.lower().find(search_arg) > -1:
+            result.append(i)
+    render.render_help(result)
 
 
 @input_error
@@ -275,27 +282,43 @@ def get_closest_match(command, COMMANDS):
     return closest_match[0] if closest_match else None
 
 
-help = """
-Available commands:
-Exit - 'close' or 'exit'
-Start work - 'hello'
-Add new contact - 'add' <name without spaces> <phone>
-Add new phone - 'add-phone' <name without spaces> <phone1>,<phone2>,...
-Remove all phones - 'remove-phone' <name without spaces>
-Edit phone - 'edit' <name without spaces> phone <phone to replace> <new phone>
-Edit/add email - 'edit' <name without spaces> email <new email>
-Edit/add birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
-Edit name - 'edit' <name without spaces> name <new name>
-Edit address - 'edit' <name without spaces> address <new address>
-Get all phones for contact - 'get-phone' <name without spaces>
-Find contacts by value - 'find' <value containing in any field>
-Remove email - 'remove-email' <name without spaces>
-Get Birthday of contact - 'show-birthday' <name without spaces>
-Get list of contacts to be congratulated next week - 'birthdays'
-Remove contact - 'remove' <name without spaces>
-Add address - 'add-address' <name without spaces> <address> 
-Print all contacts - 'all'            
-        """
+help = [
+    HelpCommand("Exit", "'close' or 'exit'"),
+    HelpCommand("Start work", "'hello'"),
+    HelpCommand("Get help. List of available commands", "'hello'"),
+    HelpCommand("Get help. Search commands by text", "'hello' {value to search}"),
+    HelpCommand("Add new contact",
+                "'add' {contact's name without spaces} {phone}"),
+    HelpCommand("Remove existing contact",
+                "'remove {contact's name without spaces}"),
+    HelpCommand("Find contacts by value",
+                "'find' {value containing in any field}"),
+    HelpCommand("Add new phone to existing contact",
+                "'add-phone' {contact's name without spaces} {phone}"),
+    HelpCommand("Remove all phones from existing contact",
+                "'remove-phone' {contact's name without spaces}"),
+    HelpCommand("Edit phone of existing contact",
+                "'edit' {contact's name without spaces} phone {new phone}"),
+    HelpCommand("Add/edit email of existing contact",
+                "'edit' {contact's name without spaces} email {new email}"),
+    HelpCommand("Remove email of existing contact",
+                "'get-phone' {contact's name without spaces}"),
+    HelpCommand("Add/edit birthday of existing contact",
+                "'edit' {contact's name without spaces} birthday {date in format DD.MM.YYYY}"),
+    HelpCommand("Get birthday of existing contact",
+                "'show-birthday' {contact's name without spaces}"),
+    HelpCommand("Edit name of existing contact",
+                "'edit' {contact's name without spaces} name {new name}"),
+    HelpCommand("Add address to existing contact",
+                "'add-address' {contact's name without spaces} {new address}"),
+    HelpCommand("Edit address of existing contact",
+                "'edit' {contact's name without spaces} address {new address}"),
+    HelpCommand(
+        "Get list of contacts to be congratulated next week", "'birthdays'"),
+    HelpCommand("Remove existing contact",
+                "'remove' {contact's name without spaces}"),
+    HelpCommand("Print all contacts", "'all'"),
+]
 
 
 def main():
@@ -318,7 +341,7 @@ def main():
     }
 
     print("Welcome to the assistant bot!")
-    print(help)
+    render.render_help(help)
     while True:
         user_input = input("\n\nEnter a command: ").strip()
         command, *args = parse_input(user_input)
