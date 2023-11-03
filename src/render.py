@@ -23,6 +23,7 @@ def render_contacts(records: [Record], title="Contacts:"):
     console.print(table)
     console.print(f"Found contacts: {len(records)}")
 
+
 def render_birhtdays(dictionaly: dict, days: int):
     table = Table(title=f"Birthdays in next {days} days:", show_lines=True)
     table.add_column("Day", justify="center", style="magenta")
@@ -34,6 +35,21 @@ def render_birhtdays(dictionaly: dict, days: int):
     console = Console()
     console.print(table)
     console.print(f"Found days: {len(dictionaly.keys())}")
+
+
+def render_notes(notes):
+    table = Table(title=f"Notes:", show_lines=True)
+    table.add_column("Title", justify="center", style="magenta")
+    table.add_column("Body", justify="center")
+    table.add_column("Tags", justify="center")
+
+    for note in notes:
+        table.add_row(note.title, note.body, ", ".join(note.get_note_tags()))
+
+    console = Console()
+    console.print(table)
+    console.print(f"Found notes: {len(notes)}")
+
 
 def __get_if_empty(value):
     return str(value) if value else "-"
