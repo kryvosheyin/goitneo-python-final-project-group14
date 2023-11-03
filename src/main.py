@@ -390,6 +390,13 @@ help = [
     HelpCommand("Get list of contacts to be congratulated next week", "'birthdays'"),
     HelpCommand("Remove existing contact", "'remove' {contact's name without spaces}"),
     HelpCommand("Print all contacts", "'all'"),
+    HelpCommand(
+        "Add new note", "'add-note' {note title} {note text with multiple lines}"
+    ),
+    HelpCommand("Print all saved notes", "'all-notes'"),
+    HelpCommand("Find note by title", "'find-note' {note title}"),
+    HelpCommand("Delete note by title", "'delete-note' {note title}"),
+    HelpCommand("Edit note text (add to existing)", "'edit-note' {note title}"),
 ]
 
 
