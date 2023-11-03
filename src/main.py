@@ -263,7 +263,7 @@ def extract_argument(error_msg: str, args, number_values=1):
 
 
 def extract_name(args):
-    return extract_argument("Please provide contact name", args)
+    return extract_argument("Please provide contact name", args)[0]
 
 
 def save_to_file(book: AddressBook, filename: str = "address_book.pkl"):
