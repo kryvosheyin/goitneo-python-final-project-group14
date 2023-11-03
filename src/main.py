@@ -297,9 +297,7 @@ def multi_line_input(prompt="Enter text (press Enter twice to finish): "):
 
 
 def print_notes(address_book: AddressBook, _):
-    for name, item in address_book.items():
-        if type(item) is Note:
-            print(item.title, item.body)
+    render.render_notes(address_book.data.values())
 
 
 def find_note(address_book: AddressBook, title):
