@@ -56,9 +56,8 @@ def print_help_message(_, __):
 
 @input_error
 def add_contact(address_book: AddressBook, args):
-    name, phone = extract_argument(
+    name, phone, args = extract_argument(
         "Please provide name and phone", args, number_values=2)
-    print(f"{name} {phone}")
     contact = Record(name)
     contact.add_phone(phone)
     address_book.add_record(contact)
@@ -67,7 +66,7 @@ def add_contact(address_book: AddressBook, args):
 
 @input_error
 def add_phone(address_book: AddressBook, args):
-    name, phone = extract_argument(
+    name, phone, args = extract_argument(
         "Please provide name and phone", args, number_values=2)
     contact = address_book.find(name)
     contact.add_phone(phone)
@@ -116,7 +115,7 @@ def edit_birthday(contact: Record, args):
         raise ValueError(
             "Please provide name and date of birth in format DD.MM.YYY")
     contact.set_birthday(int(year), int(month), int(day))
-    return f"Birthday chenged to {contact.birthday} for {contact.name}"
+    return f"Birthday changed to {contact.birthday} for {contact.name}"
 
 
 def edit_name(address_book: AddressBook, contact: Record, args):
@@ -305,7 +304,7 @@ Exit - 'close' or 'exit'
 Start work - 'hello'
 Add new contact - 'add' <name without spaces> <phone>
 Add new phone - 'add-phone' <name without spaces> <phone1>,<phone2>,...
-Remove phone - 'remove-phone' <name without spaces> <phone>
+Remove all phones - 'remove-phone' <name without spaces>
 Edit phone - 'edit' <name without spaces> phone <phone to replace> <new phone>
 Edit/add email - 'edit' <name without spaces> email <new email>
 Edit/add birthday - 'edit' <name without spaces> birthday <date in format DD.MM.YYYY>
