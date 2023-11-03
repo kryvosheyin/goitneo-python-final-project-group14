@@ -11,11 +11,11 @@ from classes.AddressBook import AddressBook
 from classes.Name import Name
 from classes.Record import Record
 from classes.Email import Email
-from classes.Birthday import Birthday
 from classes.birthdays import get_upcoming_birthdays
 from classes.address import Address
 import pickle
 import difflib
+import render
 
 
 def input_error(func):
@@ -202,26 +202,11 @@ def add_address(address_book: AddressBook, args):
 
 
 def get_all(address_book: AddressBook, _):
-    print(f"{'_'*135}")
-    print(f"|{'Name:':^40}|{'Phone:':^30}|{'Email:':^30}|{'Birthday:':^30}|")
-    print(f"|{'_'*40}|{'_'*30}|{'_'*30}|{'_'*30}|")
-    if len(address_book.data) > 0:
-        for contact, contact_info in address_book.data.items():
-            print(
-                f"|{str(contact_info.name):^40}|{(str(contact_info.get_phones_list())):^30}|{str(contact_info.email):^30}|{str(contact_info.birthday):^30}|"
-            )
-            print(f"|{'_'*40}|{'_'*30}|{'_'*30}|{'_'*30}|")
-    else:
-        print(f"|{' '*133}|")
-        print(f"|{'No records found. Add at first':^133}|")
-        print(f"|{'_'*133}|")
+    render.render_contacts(address_book.data.values())
 
 
 def render_contacts(records: [Record], _):
-    address_book: AddressBook = AddressBook()
-    for record in records:
-        address_book.add_record(record)
-    get_all(address_book, _)
+    render.render_contacts(records, title="Found contacts:")
 
 
 def birthdays(address_book: AddressBook, _):
@@ -229,21 +214,13 @@ def birthdays(address_book: AddressBook, _):
         input("Please enter the number of days you want to check: "))
     birthday_dict = get_upcoming_birthdays(
         address_book.data.values(), number_of_days)
-    print(f"{'_'*73}")
-    print(f"|{'Day:':^30}|{'Name:':^40}|")
-    print(f"|{'_'*30}|{'_'*40}|")
+    result = {}
     if birthday_dict:
         sorted_days = sorted(birthday_dict)
         for day in sorted_days:
             if day in birthday_dict:
-                print(
-                    f"|{day.strftime('%d %B'):30}|{', '.join(birthday_dict[day]):^40}|"
-                )
-                print(f"|{'_'*30}|{'_'*40}|")
-    else:
-        print(f"|{' '*71}|")
-        print(f"|{'No matches found.':^71}|")
-        print(f"|{'_'*71}|")
+                result[day.strftime('%d %B')] = ', '.join(birthday_dict[day])
+    render.render_birhtdays(result, number_of_days)
 
 
 def extract_argument(error_msg: str, args, number_values=1):
