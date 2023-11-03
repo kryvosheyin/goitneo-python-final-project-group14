@@ -5,7 +5,7 @@ from classes.Exceptions import (
     BirthdayFormatException,
     IndexOutOfRangeException,
     NotFoundCommand,
-    IncorrectAddressFormatException
+    IncorrectAddressFormatException,
 )
 from classes.AddressBook import AddressBook
 from classes.Name import Name
