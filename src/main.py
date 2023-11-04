@@ -275,7 +275,9 @@ def add_note(address_book: AddressBook, args):
     title = Title(title_args.strip())
     body_input = multi_line_input("Please enter the note text:")
     body = NoteBody(body_input)
-    address_book.add_note(Note(title, body))
+    note = Note(title, body)
+    note.extract_tags()
+    address_book.add_note(note)
     return "Your note is successfully saved"
 
 
@@ -299,6 +301,12 @@ def multi_line_input(prompt="Enter text (press Enter twice to finish): "):
 
 def print_notes(address_book: AddressBook, _):
     render.render_notes(address_book.data.values())
+
+
+@input_error
+def find_note_by_tag(address_book: AddressBook, search_tag):
+    tag = extract_name(search_tag)
+    render.render_notes(address_book.search_notes_by_tag(tag))
 
 
 @input_error
@@ -397,6 +405,7 @@ help = [
     HelpCommand("Find note by title", "'find-note' {note title}"),
     HelpCommand("Delete note by title", "'delete-note' {note title}"),
     HelpCommand("Edit note text (add to existing)", "'edit-note' {note title}"),
+    HelpCommand("Search notes by tags", "'find-tag' {tag word}"),
 ]
 
 
@@ -422,6 +431,7 @@ def main():
         "find-note": find_note,
         "delete-note": delete_note,
         "edit-note": edit_note,
+        "find-tag": find_note_by_tag,
     }
 
     print("Welcome to the assistant bot!")
