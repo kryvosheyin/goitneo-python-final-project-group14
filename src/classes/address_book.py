@@ -32,6 +32,16 @@ class AddressBook(UserDict):
             raise KeyError(f"Note title {title} does not exist")
         return note
 
+    def search_notes_by_tag(self, search_tag: str):
+        matching_notes = []
+        all_notes = self.filter_by_class(Note)
+
+        for note in self.data.values():
+            # Use direct tag value comparison instead of string manipulation
+            if any(tag.value == search_tag for tag in note.tags):
+                matching_notes.append(note)
+        return matching_notes
+
     def delete_note(self, title):
         note = self.find_note(title)
         try:
