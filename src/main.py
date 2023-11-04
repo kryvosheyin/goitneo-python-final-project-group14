@@ -20,7 +20,10 @@ from classes.note.note_body import NoteBody
 from classes.note.note_title import Title
 import pickle
 import difflib
+import platform
 import utils.render as render
+
+import platform
 
 
 def input_error(func):
@@ -372,6 +375,18 @@ help = [
         "'edit' {contact's name without spaces} email {new email}",
     ),
     HelpCommand(
+        "Remove all phones from existing contact",
+        "'remove-phone' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Edit phone of existing contact",
+        "'edit' {contact's name without spaces} phone {new phone}",
+    ),
+    HelpCommand(
+        "Add/edit email of existing contact",
+        "'edit' {contact's name without spaces} email {new email}",
+    ),
+    HelpCommand(
         "Remove email of existing contact",
         "'get-phone' {contact's name without spaces}",
     ),
@@ -433,6 +448,18 @@ def main():
         "edit-note": edit_note,
         "find-tag": find_note_by_tag,
     }
+
+    if platform.system().lower() != "windows":
+        import readline
+
+        def completer(text, state):
+            options = [i for i in COMMANDS if i.startswith(text)]
+            if state < len(options):
+                return options[state]
+            return None
+
+        readline.parse_and_bind("bind ^I rl_complete")
+        readline.set_completer(completer)
 
     print("Welcome to the assistant bot!")
     render.render_help(help)
