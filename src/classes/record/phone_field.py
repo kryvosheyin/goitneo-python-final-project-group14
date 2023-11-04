@@ -1,5 +1,5 @@
-from classes.Fields import Field
-from classes.Exceptions import IncorrectPhoneFormatException
+from classes.fields import Field
+from utils.custom_exceptions import IncorrectPhoneFormatException
 import re
 
 

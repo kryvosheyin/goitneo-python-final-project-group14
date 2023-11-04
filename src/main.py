@@ -1,4 +1,4 @@
-from classes.Exceptions import (
+from utils.custom_exceptions import (
     IncorrectNameException,
     IncorrectPhoneFormatException,
     UnableToEditPhoneException,
@@ -6,18 +6,22 @@ from classes.Exceptions import (
     IndexOutOfRangeException,
     NotFoundCommand,
     IncorrectAddressFormatException,
+    IncorrectTitleException,
 )
-from classes.AddressBook import AddressBook
-from classes.Name import Name
-from classes.Record import Record
-from classes.Email import Email
-from classes.birthdays import get_upcoming_birthdays
-from classes.address import Address
-from classes.help_command import HelpCommand
+from classes.address_book import AddressBook
+from classes.record.name_field import Name
+from classes.record.contact_record import Record
+from classes.record.email_field import Email
+from utils.birthdays_calculator import get_upcoming_birthdays
+from classes.record.address_field import Address
+from utils.help_command import HelpCommand
+from classes.note.note import Note
+from classes.note.note_body import NoteBody
+from classes.note.note_title import Title
 import pickle
 import difflib
 import platform
-import render
+import utils.render as render
 
 import platform
 
@@ -37,6 +41,7 @@ def input_error(func):
             IndexOutOfRangeException,
             NotFoundCommand,
             IncorrectAddressFormatException,
+            IncorrectTitleException,
         ) as err:
             return str(err)
 
@@ -221,6 +226,7 @@ def render_contacts(records: [Record], _):
 
 def birthdays(address_book: AddressBook, _):
     number_of_days = int(input("Please enter the number of days you want to check: "))
+
     birthday_dict = get_upcoming_birthdays(address_book.data.values(), number_of_days)
     result = {}
     if birthday_dict:
@@ -266,6 +272,68 @@ def find(book: AddressBook, args):
     render_contacts(records, args)
 
 
+@input_error
+def add_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    title = Title(title_args.strip())
+    body_input = multi_line_input("Please enter the note text:")
+    body = NoteBody(body_input)
+    note = Note(title, body)
+    note.extract_tags()
+    address_book.add_note(note)
+    return "Your note is successfully saved"
+
+
+def multi_line_input(prompt="Enter text (press Enter twice to finish): "):
+    print(prompt)
+    input_lines = []
+
+    while True:
+        line = input().strip()
+        if line == "":
+            if input_lines and input_lines[-1] == "":
+                input_lines.pop()  # Remove the last empty line
+                break
+            elif not input_lines:
+                break  # Stop if the first input is a double enter
+        input_lines.append(line)
+
+    text = "\n".join(input_lines)
+    return text
+
+
+def print_notes(address_book: AddressBook, _):
+    render.render_notes(address_book.data.values())
+
+
+@input_error
+def find_note_by_tag(address_book: AddressBook, search_tag):
+    tag = extract_name(search_tag)
+    render.render_notes(address_book.search_notes_by_tag(tag))
+
+
+@input_error
+def delete_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    address_book.delete_note(title_args)
+    return "Note was deleted"
+
+
+@input_error
+def find_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    notes_list = list()
+    notes_list.append(address_book.find_note(title_args))
+    render.render_notes(notes_list)
+
+
+@input_error
+def edit_note(address_book: AddressBook, args):
+    title_args = " ".join(args).strip()
+    note = address_book.find_note(title_args)
+    note.edit_note(multi_line_input())
+
+
 def load_from_file(filename: str = "address_book.pkl") -> AddressBook:
     try:
         with open(filename, "rb") as file:
@@ -307,6 +375,18 @@ help = [
         "'edit' {contact's name without spaces} email {new email}",
     ),
     HelpCommand(
+        "Remove all phones from existing contact",
+        "'remove-phone' {contact's name without spaces}",
+    ),
+    HelpCommand(
+        "Edit phone of existing contact",
+        "'edit' {contact's name without spaces} phone {new phone}",
+    ),
+    HelpCommand(
+        "Add/edit email of existing contact",
+        "'edit' {contact's name without spaces} email {new email}",
+    ),
+    HelpCommand(
         "Remove email of existing contact",
         "'get-phone' {contact's name without spaces}",
     ),
@@ -333,6 +413,14 @@ help = [
     HelpCommand("Get list of contacts to be congratulated next week", "'birthdays'"),
     HelpCommand("Remove existing contact", "'remove' {contact's name without spaces}"),
     HelpCommand("Print all contacts", "'all'"),
+    HelpCommand(
+        "Add new note", "'add-note' {note title} {note text with multiple lines}"
+    ),
+    HelpCommand("Print all saved notes", "'all-notes'"),
+    HelpCommand("Find note by title", "'find-note' {note title}"),
+    HelpCommand("Delete note by title", "'delete-note' {note title}"),
+    HelpCommand("Edit note text (add to existing)", "'edit-note' {note title}"),
+    HelpCommand("Search notes by tags", "'find-tag' {tag word}"),
 ]
 
 
@@ -353,6 +441,12 @@ def main():
         "add-address": add_address,
         "all": get_all,
         "find": find,
+        "add-note": add_note,
+        "all-notes": print_notes,
+        "find-note": find_note,
+        "delete-note": delete_note,
+        "edit-note": edit_note,
+        "find-tag": find_note_by_tag,
     }
 
     if platform.system().lower() != "windows":
@@ -378,6 +472,7 @@ def main():
             print("Good bye!")
             break
         elif command in COMMANDS:
+            print(50 * "\n")
             result = COMMANDS[command](address_book, args)
             if result:
                 print(result)
