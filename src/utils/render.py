@@ -50,7 +50,7 @@ def render_birhtdays(dictionary: dict, days: int):
 def render_notes(notes):
     table = Table(title=f"Notes:", show_lines=True)
     table.add_column("Title", justify="center", style="magenta")
-    table.add_column("Body", justify="center")
+    table.add_column("Body", justify="left")
     table.add_column("Tags", justify="center")
     counter = 0
     for note in notes:
