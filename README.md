@@ -42,7 +42,9 @@ python main.py
 
 Дотримуйтесь інструкцій, що виводяться на екрані, щоб користуватися Персональним помічником:
 
-![image](https://github.com/kryvosheyin/goitneo-python-final-project-group14/assets/143953227/4236d61d-1979-4a78-b739-c5ed52668973)
+
+<img width="1148" alt="image" src="https://github.com/kryvosheyin/goitneo-python-final-project-group14/assets/86955461/0de52268-0e08-499c-93a1-1e4355842eb3">
+
 
 ## Внесок:
 
