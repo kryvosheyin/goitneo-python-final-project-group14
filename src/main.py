@@ -21,6 +21,7 @@ from classes.note.note_title import Title
 import pickle
 import difflib
 import utils.render as render
+from rich.console import Console
 
 
 def input_error(func):
@@ -433,11 +434,13 @@ def main():
         "edit-note": edit_note,
         "find-tag": find_note_by_tag,
     }
+    console = Console()
 
     print("Welcome to the assistant bot!")
     render.render_help(help)
     while True:
-        user_input = input("\n\nEnter a command: ").strip()
+        print(3 * "\n")
+        user_input = console.input("[bold blue]Enter a command:[/] ").strip()
         command, *args = parse_input(user_input)
         if command in ["close", "exit"]:
             print("Saving contacts..")
@@ -445,16 +448,16 @@ def main():
             print("Good bye!")
             break
         elif command in COMMANDS:
-            print(50 * "\n")
             result = COMMANDS[command](address_book, args)
             if result:
-                print(result)
+                console.print(f"\n[green]{result.upper()}[/]")
+
         else:
             predicted_command = get_closest_match(command, COMMANDS)
             if predicted_command:
                 print(f"Did you mean {predicted_command}? ")
             else:
-                print("Invalid command.")
+                console.print("\n[bold red]INVALID COMMAND[/]")
 
 
 if __name__ == "__main__":
