@@ -373,8 +373,12 @@ help = [
         "'edit' {contact's name without spaces} email {new email}",
     ),
     HelpCommand(
-        "Remove email of existing contact",
+        "Get phones of existing contact",
         "'get-phone' {contact's name without spaces}",
+    ),
+        HelpCommand(
+        "Remove email of existing contact",
+        "'remove-email' {contact's name without spaces}",
     ),
     HelpCommand(
         "Add/edit birthday of existing contact",
@@ -396,7 +400,7 @@ help = [
         "Edit address of existing contact",
         "'edit' {contact's name without spaces} address {new address}",
     ),
-    HelpCommand("Get list of contacts to be congratulated next week", "'birthdays'"),
+    HelpCommand("Get list of contacts to be congratulated", "'birthdays'"),
     HelpCommand("Remove existing contact", "'remove' {contact's name without spaces}"),
     HelpCommand("Print all contacts", "'all'"),
     HelpCommand(
@@ -450,7 +454,7 @@ def main():
         elif command in COMMANDS:
             result = COMMANDS[command](address_book, args)
             if result:
-                console.print(f"\n[green]{result.upper()}[/]")
+                console.print(f"\n[green]{result.upper() if isinstance(result, str) else result}[/]")
 
         else:
             predicted_command = get_closest_match(command, COMMANDS)
