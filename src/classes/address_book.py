@@ -36,9 +36,10 @@ class AddressBook(UserDict):
         matching_notes = []
         all_notes = self.filter_by_class(Note)
 
-        for note in self.data.values():
+        for note in all_notes:
+            note = all_notes.get(note)
             # Use direct tag value comparison instead of string manipulation
-            if any(tag.value == search_tag for tag in note.tags):
+            if note and any(tag.value == search_tag for tag in note.tags):
                 matching_notes.append(note)
         return matching_notes
 

@@ -23,6 +23,12 @@ import difflib
 import utils.render as render
 from rich.console import Console
 
+console = Console()
+
+
+def print_warning(message):
+    console.print(f"[red]{message}[/]")
+
 
 def input_error(func):
     def inner(*args, **kwargs):
@@ -41,7 +47,7 @@ def input_error(func):
             IncorrectAddressFormatException,
             IncorrectTitleException,
         ) as err:
-            return str(err)
+            return print_warning(str(err))
 
     return inner
 
@@ -434,7 +440,6 @@ def main():
         "edit-note": edit_note,
         "find-tag": find_note_by_tag,
     }
-    console = Console()
 
     print("Welcome to the assistant bot!")
     render.render_help(help)
@@ -450,7 +455,9 @@ def main():
         elif command in COMMANDS:
             result = COMMANDS[command](address_book, args)
             if result:
-                console.print(f"\n[green]{result.upper()}[/]")
+                console.print(
+                    f"\n[green]{result.upper() if isinstance(result, str) else result}[/]"
+                )
 
         else:
             predicted_command = get_closest_match(command, COMMANDS)
@@ -462,3 +469,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+from faker import Faker
