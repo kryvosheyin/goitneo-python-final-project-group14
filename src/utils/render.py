@@ -44,7 +44,7 @@ def render_birhtdays(dictionary: dict, days: int):
     if len(dictionary.keys()) > 0:
         console.print(f"Found days: {len(dictionary.keys())}")
     else:
-        console.print(f"No one should be concratulated in {days} days")
+        console.print(f"No one should be congratulated in {days} days")
 
 
 def render_notes(notes):
